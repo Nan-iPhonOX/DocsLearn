@@ -2,22 +2,22 @@
 layout: home
 
 title: 图书馆
-titleTemplate: 由 Vite 和 Vue 驱动的静态学习站点
+titleTemplate: 努力学习
 
 hero:
   name: 图书馆
-  text: 由 Vite 和 Vue 驱动的静态学习站点
-  tagline: 将 Markdown 变成优雅的文档
+  text: 一个给老婆学习提供效率的站点
+  tagline: 让学习随时随地
   actions:
     - theme: brand
-      text: 什么是 VitePress?
-      link: /PressGuide/what-is-vitepress
+      text: 每日一学
+      link: /Learn/Expertise
     - theme: alt
-      text: 快速开始
+      text: 使用参考
       link: /PressGuide/getting-started
   image:
-      src: /vitepress-logo-large.webp
-      alt: VitePress
+      src: /阅读书籍.png
+      alt: 认真学习
 
 features:
   - icon: 📝

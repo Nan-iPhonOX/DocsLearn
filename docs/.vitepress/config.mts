@@ -1,6 +1,7 @@
 import { defineConfig } from "vitepress";
 
 export default defineConfig({
+  head: [['link', { rel: 'icon', href: '/DocsLearn/favicon.ico' }]],
   lang: "zh-Hans",
   title: "图书馆",
   description: "由 Vite 和 Vue 驱动的静态站点生成器",
@@ -25,8 +26,8 @@ export default defineConfig({
     },
 
     footer: {
-      message: "郑州高铁基础设施段",
-      copyright: `郑州南郑万高铁综合维修车间2019-${new Date().getFullYear()}`,
+      message: "For Miss Li.",
+      copyright: `教资2019-${new Date().getFullYear()}`,
     },
 
     docFooter: {
