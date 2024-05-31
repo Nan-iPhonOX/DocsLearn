@@ -758,6 +758,25 @@ FireFox 3+ 支持 rgba 值，并且能够提供同样的效果，但是为了在
 
 除了颜色属性，还有其他一些属性用来控制绘制描边的方式。
 
+<svg width="160" height="140" xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <rect width="100%" height="100%" fill="rgb(230,230,230)" rx="5"/>
+  <g stroke="black" stroke-width="20">
+    <line x1="40" x2="120" y1="20" y2="20" stroke-linecap="butt"/>
+    <line x1="40" x2="120" y1="60" y2="60"  stroke-linecap="square"/>
+    <line x1="40" x2="120" y1="100" y2="100" stroke-linecap="round"/>
+  </g>
+  <g stroke="red" stroke-width="2">
+    <line x1="40" x2="120" y1="20" y2="20" />
+    <line x1="40" x2="120" y1="60" y2="60"  />
+    <line x1="40" x2="120" y1="100" y2="100"/>
+  </g>
+  <g fill="blue" font-size="12">
+    <text x="20" y="42">stroke-linecap="butt"</text>
+    <text x="12" y="82">stroke-linecap="square"</text>
+    <text x="15" y="122">stroke-linecap="round"</text>
+  </g>
+</svg>
+
 ```xml
 <?xml version="1.0" standalone="no"?>
 <svg width="160" height="140" xmlns="http://www.w3.org/2000/svg" version="1.1">
@@ -779,6 +798,31 @@ FireFox 3+ 支持 rgba 值，并且能够提供同样的效果，但是为了在
 
 还有一个`stroke-linejoin`属性，用来控制两条描边线段之间，用什么方式连接。
 
+<svg width="160" height="280" xmlns="http://www.w3.org/2000/svg" version="1.1">
+
+  <rect width="100%" height="100%" fill="rgb(230,230,230)" rx="5"/>
+
+  <polyline points="40 60 80 20 120 60" stroke="black" stroke-width="20"
+      stroke-linecap="butt" fill="none" stroke-linejoin="miter"/>
+
+  <polyline points="40 140 80 100 120 140" stroke="black" stroke-width="20"
+      stroke-linecap="round" fill="none" stroke-linejoin="round"/>
+
+  <polyline points="40 220 80 180 120 220" stroke="black" stroke-width="20"
+      stroke-linecap="square" fill="none" stroke-linejoin="bevel"/>
+
+  <g stroke="red" fill="none" >
+    <polyline points="40 60 80 20 120 60"/>
+    <polyline points="40 140 80 100 120 140"/>
+    <polyline points="40 220 80 180 120 220"/>
+  </g>
+
+  <g font-size="12">
+    <text x="20" y="85">stroke-linejoin="miter"</text>
+    <text x="18" y="165">stroke-linejoin="round"</text>
+    <text x="18" y="245">stroke-linejoin="bevel"</text>
+  </g>
+</svg>
 
 ```xml
 <?xml version="1.0" standalone="no"?>
@@ -798,6 +842,15 @@ FireFox 3+ 支持 rgba 值，并且能够提供同样的效果，但是为了在
 
 最后，你可以通过指定`stroke-dasharray`属性，将虚线类型应用在描边上。
 
+<svg width="200" height="150" xmlns="http://www.w3.org/2000/svg" version="1.1">
+
+  <rect width="100%" height="100%" fill="rgb(230,230,230)" rx="5"/>
+
+  <path d="M 10 75 Q 50 10 100 75 T 190 75" stroke="black"
+    stroke-linecap="round" stroke-dasharray="5,10,5" fill="none"/>
+  <path d="M 10 75 L 190 75" stroke="red"
+    stroke-linecap="round" stroke-width="1" stroke-dasharray="5,5" fill="none"/>
+</svg>
 
 ```xml
 <?xml version="1.0" standalone="no"?>
@@ -876,3 +929,557 @@ CSS 可以利用 style 属性插入到元素的行间：
   stroke: black;
 }
 ```
+
+## 渐变
+
+并非只能简单填充颜色和描边，更令人兴奋的是，你还可以创建和并在填充和描边上应用渐变色。
+
+有两种类型的渐变：线性渐变和径向渐变。你必须给渐变内容指定一个 id 属性，否则文档内的其他元素就不能引用它。为了让渐变能被重复使用，渐变内容需要定义在`<defs>`标签内部，而不是定义在形状上面。
+
+### 线性渐变
+
+线性渐变沿着直线改变颜色，要插入一个线性渐变，你需要在 SVG 文件的defs 元素内部，创建一个`<linearGradient>` 节点。
+
+### 基础示例
+
+<svg width="120" height="240" version="1.1" xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+    <linearGradient id="Gradient1">
+      <stop class="stop1" offset="0%" />
+      <stop class="stop2" offset="50%" />
+      <stop class="stop3" offset="100%" />
+    </linearGradient>
+    <linearGradient id="Gradient2" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="red" />
+      <stop offset="50%" stop-color="black" stop-opacity="0" />
+      <stop offset="100%" stop-color="blue" />
+    </linearGradient>
+  </defs>
+
+  <rect id="rect1" x="10" y="10" rx="15" ry="15" width="100" height="100" fill="url(#Gradient1)"/>
+  <rect
+    x="10"
+    y="120"
+    rx="15"
+    ry="15"
+    width="100"
+    height="100"
+    fill="url(#Gradient2)" />
+</svg>
+
+<style type="text/css">
+  #rect1 { fill: url(#Gradient1); }
+  .stop1 { stop-color: red; }
+  .stop2 { stop-color: black; stop-opacity: 0; }
+  .stop3 { stop-color: blue; }
+</style>
+
+```XML
+<svg width="120" height="240" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="Gradient1">
+      <stop class="stop1" offset="0%" />
+      <stop class="stop2" offset="50%" />
+      <stop class="stop3" offset="100%" />
+    </linearGradient>
+    <linearGradient id="Gradient2" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="red" />
+      <stop offset="50%" stop-color="black" stop-opacity="0" />
+      <stop offset="100%" stop-color="blue" />
+    </linearGradient>
+    <!-- 在markdown中不生效,可在外部定义<style> -->
+    <style type="text/css">
+      <![CDATA[
+              #rect1 { fill: url(#Gradient1); }
+              .stop1 { stop-color: red; }
+              .stop2 { stop-color: black; stop-opacity: 0; }
+              .stop3 { stop-color: blue; }
+            ]]>
+    </style>
+    <!-- ################################# -->
+  </defs>
+
+  <rect id="rect1" x="10" y="10" rx="15" ry="15" width="100" height="100" />
+  <rect
+    x="10"
+    y="120"
+    rx="15"
+    ry="15"
+    width="100"
+    height="100"
+    fill="url(#Gradient2)" />
+</svg>
+```
+以上是一个应用了线性渐变的`<rect>`元素的示例。线性渐变内部有几个`<stop>` 结点，这些结点通过指定位置的 offset（偏移）属性和 stop-color（颜色中值）属性来说明在渐变的特定位置上应该是什么颜色；可以直接指定这两个属性值，也可以通过 CSS 来指定他们的值，该例子中混合使用了这两种方法。例如：该示例中指明了渐变开始颜色为红色，到中间位置时变成半透明的黑色，最后变成蓝色。虽然你可以根据需求按照自己的喜好插入很多中间颜色，但是偏移量应该始终从 0% 开始（或者 0 也可以，百分号可以扔掉），到 100%（或 1）结束。如果stop设置的位置有重合，将使用 XML 树中较晚设置的值。而且，类似于填充和描边，你也可以指定属性stop-opacity来设置某个位置的半透明度（同样，对于 FF3 你也可以设置 rgba 值）。
+
+```XML
+<stop offset="100%" stop-color="yellow" stop-opacity="0.5" />
+```
+
+使用渐变时，我们需要在一个对象的属性fill或属性stroke中引用它，这跟你在 CSS 中使用url引用元素的方法一样。在本例中，url 只是一个渐变的引用，我们已经给这个渐变一个 ID——“Gradient”。要想附加它，将属性fill设置为url(#Gradient)即可。现在对象就变成多色的了，也可以用同样的方式处理stroke。
+
+`<linearGradient> `元素还需要一些其他的属性值，它们指定了渐变的大小和出现范围。渐变的方向可以通过两个点来控制，它们分别是属性 x1、x2、y1 和 y2，这些属性定义了渐变路线走向。渐变色默认是水平方向的，但是通过修改这些属性，就可以旋转该方向。下例中的 Gradient2 创建了一个垂直渐变。
+
+```xml
+<linearGradient id="Gradient2" x1="0" x2="0" y1="0" y2="1"></linearGradient>
+```
+:::tip 备注
+你也可以在渐变上使用xlink:href 属性。如果使用了该属性时，一个渐变的属性和颜色中值（stop）可以被另一个渐变包含引用。在下例中，你就不需要在 Grandient2 中重新创建全部的颜色中值（stop）
+
+```xml
+<linearGradient id="Gradient1">
+  <stop id="stop1" offset="0%" />
+  <stop id="stop2" offset="50%" />
+  <stop id="stop3" offset="100%" />
+</linearGradient>
+<linearGradient
+  id="Gradient2"
+  x1="0"
+  x2="0"
+  y1="0"
+  y2="1"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xlink:href="#Gradient1" />
+```
+
+尽管通常你可能在文档的顶部就定义了 Gradient1，但我在结点上直接包含了 xlink 的命名空间，关于这点的更多信息我们会在[讨论图片](#讨论图片)的时候详解。
+:::
+
+### 径向渐变
+径向渐变与线性渐变相似，只是它是从一个点开始发散绘制渐变。创建径向渐变需要在文档的defs中添加一个[`<radialGradient>`](#waiturl)元素
+
+示例
+
+```xml
+<?xml version="1.0" standalone="no"?>
+<svg width="120" height="240" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="RadialGradient1">
+      <stop offset="0%" stop-color="red" />
+      <stop offset="100%" stop-color="blue" />
+    </radialGradient>
+    <radialGradient id="RadialGradient2" cx="0.25" cy="0.25" r="0.25">
+      <stop offset="0%" stop-color="red" />
+      <stop offset="100%" stop-color="blue" />
+    </radialGradient>
+  </defs>
+
+  <rect
+    x="10"
+    y="10"
+    rx="15"
+    ry="15"
+    width="100"
+    height="100"
+    fill="url(#RadialGradient1)" />
+  <rect
+    x="10"
+    y="120"
+    rx="15"
+    ry="15"
+    width="100"
+    height="100"
+    fill="url(#RadialGradient2)" />
+</svg>
+```
+
+<svg width="120" height="240" version="1.1" xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+    <radialGradient id="RadialGradient1">
+      <stop offset="0%" stop-color="red" />
+      <stop offset="100%" stop-color="blue" />
+    </radialGradient>
+    <radialGradient id="RadialGradient2" cx="0.25" cy="0.25" r="0.25">
+      <stop offset="0%" stop-color="red" />
+      <stop offset="100%" stop-color="blue" />
+    </radialGradient>
+  </defs>
+
+  <rect
+    x="10"
+    y="10"
+    rx="15"
+    ry="15"
+    width="100"
+    height="100"
+    fill="url(#RadialGradient1)" />
+  <rect
+    x="10"
+    y="120"
+    rx="15"
+    ry="15"
+    width="100"
+    height="100"
+    fill="url(#RadialGradient2)" />
+</svg>
+
+中值（stops）的使用方法与之前一致，但是现在这个对象的颜色是中间是红色的，且向着边缘的方向渐渐的变成蓝色。跟线性渐变一样，`<radialGradient>` 节点可以有多个属性来描述其位置和方向，但是它更加复杂。径向渐变也是通过两个点来定义其边缘位置，两点中的第一个点定义了渐变结束所围绕的圆环，它需要一个中心点，由 cx 和 cy 属性及半径 r 来定义，通过设置这些点我们可以移动渐变范围并改变它的大小，如上例的第二个`<rect>`所展示的。
+
+第二个点被称为焦点，由 fx 和 fy 属性定义。第一个点描述了渐变边缘位置，焦点则描述了渐变的中心，如下例。
+
+```xml
+<?xml version="1.0" standalone="no"?>
+
+<svg width="120" height="120" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="Gradient" cx="0.5" cy="0.5" r="0.5" fx="0.25" fy="0.25">
+      <stop offset="0%" stop-color="red" />
+      <stop offset="100%" stop-color="blue" />
+    </radialGradient>
+  </defs>
+
+  <rect
+    x="10"
+    y="10"
+    rx="15"
+    ry="15"
+    width="100"
+    height="100"
+    fill="url(#Gradient)"
+    stroke="black"
+    stroke-width="2" />
+
+  <circle
+    cx="60"
+    cy="60"
+    r="50"
+    fill="transparent"
+    stroke="white"
+    stroke-width="2" />
+  <circle cx="35" cy="35" r="2" fill="white" stroke="white" />
+  <circle cx="60" cy="60" r="2" fill="white" stroke="white" />
+  <text x="38" y="40" fill="white" font-family="sans-serif" font-size="10pt">
+    (fx,fy)
+  </text>
+  <text x="63" y="63" fill="white" font-family="sans-serif" font-size="10pt">
+    (cx,cy)
+  </text>
+</svg>
+```
+
+<svg width="120" height="120" version="1.1" xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+    <radialGradient id="Gradient" cx="0.5" cy="0.5" r="0.5" fx="0.5" fy="0.5">
+      <stop offset="0%" stop-color="red" />
+      <stop offset="100%" stop-color="blue" />
+    </radialGradient>
+  </defs>
+
+  <rect
+    x="10"
+    y="10"
+    rx="15"
+    ry="15"
+    width="100"
+    height="100"
+    fill="url(#Gradient)"
+    stroke="black"
+    stroke-width="2" />
+
+  <circle
+    cx="60"
+    cy="60"
+    r="50"
+    fill="transparent"
+    stroke="white"
+    stroke-width="2" />
+  <circle cx="35" cy="35" r="2" fill="white" stroke="white" />
+  <circle cx="60" cy="60" r="2" fill="white" stroke="white" />
+  <text x="38" y="40" fill="white" font-family="sans-serif" font-size="10pt">
+    (fx,fy)
+  </text>
+  <text x="63" y="63" fill="white" font-family="sans-serif" font-size="10pt">
+    (cx,cy)
+  </text>
+</svg>
+
+因为如果焦点如之前描述的那样被移到圆圈的外面，渐变将不能正确呈现，所以该点会被假定在圆圈范围内。如果没有给出焦点，将认为该点与中心点的位置一致。
+
+线性渐变和径向渐变都需要一些额外的属性用于描述渐变过程，这里我希望额外提及一个spreadMethod属性，该属性控制了当渐变到达终点的行为，但是此时该对象尚未被填充颜色。这个属性可以有三个值：pad、reflect 或 repeat。Pad 就是目前我们见到的效果，即当渐变到达终点时，最终的偏移颜色被用于填充对象剩下的空间。reflect 会让渐变一直持续下去，不过它的效果是与渐变本身是相反的，以 100% 偏移位置的颜色开始，逐渐偏移到 0% 位置的颜色，然后再回到 100% 偏移位置的颜色。repeat 也会让渐变继续，但是它不会像 reflect 那样反向渐变，而是跳回到最初的颜色然后继续渐变。
+
+```XML
+<?xml version="1.0" standalone="no"?>
+
+<svg width="220" height="220" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient
+      id="GradientPad"
+      cx="0.5"
+      cy="0.5"
+      r="0.4"
+      fx="0.75"
+      fy="0.75"
+      spreadMethod="pad">
+      <stop offset="0%" stop-color="red" />
+      <stop offset="100%" stop-color="blue" />
+    </radialGradient>
+    <radialGradient
+      id="GradientRepeat"
+      cx="0.5"
+      cy="0.5"
+      r="0.4"
+      fx="0.75"
+      fy="0.75"
+      spreadMethod="repeat">
+      <stop offset="0%" stop-color="red" />
+      <stop offset="100%" stop-color="blue" />
+    </radialGradient>
+    <radialGradient
+      id="GradientReflect"
+      cx="0.5"
+      cy="0.5"
+      r="0.4"
+      fx="0.75"
+      fy="0.75"
+      spreadMethod="reflect">
+      <stop offset="0%" stop-color="red" />
+      <stop offset="100%" stop-color="blue" />
+    </radialGradient>
+  </defs>
+
+  <rect
+    x="10"
+    y="10"
+    rx="15"
+    ry="15"
+    width="100"
+    height="100"
+    fill="url(#GradientPad)" />
+  <rect
+    x="10"
+    y="120"
+    rx="15"
+    ry="15"
+    width="100"
+    height="100"
+    fill="url(#GradientRepeat)" />
+  <rect
+    x="120"
+    y="120"
+    rx="15"
+    ry="15"
+    width="100"
+    height="100"
+    fill="url(#GradientReflect)" />
+
+  <text x="15" y="30" fill="white" font-family="sans-serif" font-size="12pt">
+    Pad
+  </text>
+  <text x="15" y="140" fill="white" font-family="sans-serif" font-size="12pt">
+    Repeat
+  </text>
+  <text x="125" y="140" fill="white" font-family="sans-serif" font-size="12pt">
+    Reflect
+  </text>
+</svg>
+```
+
+<svg width="220" height="220" version="1.1" xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+    <radialGradient
+      id="GradientPad"
+      cx="0.5"
+      cy="0.5"
+      r="0.4"
+      fx="0.75"
+      fy="0.75"
+      spreadMethod="pad">
+      <stop offset="0%" stop-color="red" />
+      <stop offset="100%" stop-color="blue" />
+    </radialGradient>
+    <radialGradient
+      id="GradientRepeat"
+      cx="0.5"
+      cy="0.5"
+      r="0.4"
+      fx="0.75"
+      fy="0.75"
+      spreadMethod="repeat">
+      <stop offset="0%" stop-color="red" />
+      <stop offset="100%" stop-color="blue" />
+    </radialGradient>
+    <radialGradient
+      id="GradientReflect"
+      cx="0.5"
+      cy="0.5"
+      r="0.4"
+      fx="0.75"
+      fy="0.75"
+      spreadMethod="reflect">
+      <stop offset="0%" stop-color="red" />
+      <stop offset="100%" stop-color="blue" />
+    </radialGradient>
+  </defs>
+
+  <rect
+    x="10"
+    y="10"
+    rx="15"
+    ry="15"
+    width="100"
+    height="100"
+    fill="url(#GradientPad)" />
+  <rect
+    x="10"
+    y="120"
+    rx="15"
+    ry="15"
+    width="100"
+    height="100"
+    fill="url(#GradientRepeat)" />
+  <rect
+    x="120"
+    y="120"
+    rx="15"
+    ry="15"
+    width="100"
+    height="100"
+    fill="url(#GradientReflect)" />
+
+  <text x="15" y="30" fill="white" font-family="sans-serif" font-size="12pt">
+    Pad
+  </text>
+  <text x="15" y="140" fill="white" font-family="sans-serif" font-size="12pt">
+    Repeat
+  </text>
+  <text x="125" y="140" fill="white" font-family="sans-serif" font-size="12pt">
+    Reflect
+  </text>
+</svg>
+
+两种渐变都有一个叫做 gradientUnits（渐变单元）的属性，它描述了用来描述渐变的大小和方向的单元系统。该属性有两个值：userSpaceOnUse 、objectBoundingBox。默认值为 objectBoundingBox，我们目前看到的效果都是在这种系统下的，它大体上定义了对象的渐变大小范围，所以你只要指定从 0 到 1 的坐标值，渐变就会自动的缩放到对象相同大小。userSpaceOnUse 使用绝对单元，所以你必须知道对象的位置，并将渐变放在同样地位置上。上例中的 radialGradient 需要被重写成：
+
+```XML
+<radialGradient
+  id="Gradient"
+  cx="60"
+  cy="60"
+  r="50"
+  fx="35"
+  fy="35"
+  gradientUnits="userSpaceOnUse"></radialGradient>
+```
+
+你也可以利用属性 gradientTransform 给渐变添加额外的变化，但是因为我们还没有介绍 transforms，所以我们将在后续的章节中介绍它。
+
+如果对象边界框不是一个正方形，处理 gradientUnits="objectBoundingBox" 还有一些其他警告，但是这些方法特别复杂因此有待一些了解得更深的人来解释他们。
+
+## Patterns
+
+### 图案
+
+在我看来 patterns（图案）是 SVG 中用到的最让人混淆的填充类型之一。它的功能非常强大，所以我认为他们值得讨论一下并且我们应至少对他们有最基本的了解。跟渐变一样，`<pattern>` 需要放在 SVG 文档的 `<defs>` 内部。
+
+```XML
+<?xml version="1.0" standalone="no"?>
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg" version="1.1">
+  <defs>
+    <linearGradient id="Gradient1">
+      <stop offset="5%" stop-color="white" />
+      <stop offset="95%" stop-color="blue" />
+    </linearGradient>
+    <linearGradient id="Gradient2" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="5%" stop-color="red" />
+      <stop offset="95%" stop-color="orange" />
+    </linearGradient>
+
+    <pattern id="Pattern" x="0" y="0" width=".25" height=".25">
+      <rect x="0" y="0" width="50" height="50" fill="skyblue" />
+      <rect x="0" y="0" width="25" height="25" fill="url(#Gradient2)" />
+      <circle
+        cx="25"
+        cy="25"
+        r="20"
+        fill="url(#Gradient1)"
+        fill-opacity="0.5" />
+    </pattern>
+  </defs>
+
+  <rect
+    fill="url(#Pattern)"
+    stroke="black"
+    x="0"
+    y="0"
+    width="200"
+    height="200" />
+</svg>
+```
+
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg" version="1.1">
+
+  <defs>
+    <linearGradient id="Gradient1">
+      <stop offset="5%" stop-color="white" />
+      <stop offset="95%" stop-color="blue" />
+    </linearGradient>
+    <linearGradient id="Gradient2" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="5%" stop-color="red" />
+      <stop offset="95%" stop-color="orange" />
+    </linearGradient>
+    <pattern id="Pattern" x="0" y="0" width=".25" height=".25">
+      <rect x="0" y="0" width="50" height="50" fill="skyblue" />
+      <rect x="0" y="0" width="25" height="25" fill="url(#Gradient2)" />
+      <circle
+        cx="25"
+        cy="25"
+        r="20"
+        fill="url(#Gradient1)"
+        fill-opacity="0.5" />
+    </pattern>
+  </defs>
+
+  <rect
+    fill="url(#Pattern)"
+    stroke="black"
+    x="0"
+    y="0"
+    width="200"
+    height="200" />
+</svg>
+
+在 pattern 元素内部你可以包含任何之前包含过的其他基本形状，并且每个形状都可以使用之前学习过的任何样式样式化，包括渐变和半透明。这里我们在 pattern 中绘制两个矩形（两个矩形互相重叠，一个矩形是另一个矩形大小的二倍，且用于填充整个 pattern）和一个圆。
+
+关于 pattern 容易混淆的事是，pattern 定义了一个单元系统以及他们的大小。上例中，我们在 pattern 元素上定义了width和height属性，用于描述在重复下一个图案之前应该跨过多远。如果你想要在绘制时偏移矩形的开始点，也可以使用 x 和 y 属性，原因如下。
+
+就像前面使用了gradientUnits属性，同样的pattern也有一个属性patternUnits用于描述我们使用的属性单元。这同之前使用的objectBoundingBox默认值一样，所以当一个值为 1 时，它被缩放到应用 pattern 对象的宽高值。因此，我们希望 pattern 垂直和水平的重复 4 次，所以宽高被设置位 0.25，这一位置 pattern 的宽高仅为总外框大小的 0.25。
+
+与渐变不同，pattern 有第二个属性patternContentUnits，它描述了pattern元素基于基本形状使用的单元系统，这个属性默认值为userSpaceOnUse，与patternUnits属性相反，这意味着除非你至少指定其中一个属性值（patternContentUnits或patternUnits），否则在pattern中绘制的形状将与pattern元素使用的坐标系不同，当你手写这部分时会容易混淆。为了使上例生效，我们必须考虑我们的边框（200 像素）大小和我们实际希望pattern垂直和水平重复 4 次的需求。这意味着每个 pattern 单元应该是 50x50的方形，pattern 中的两个矩形和圆形的大小会被缩放适应到一个 50x50 的边框里，任何我们绘制在边框外的内容都不会显示。因为我们希望 pattern 从边框的左上角里开始，所以 pattern 也必须偏移 10 像素，也就是 pattern 的 x 和 y 属性需要调整为 10/200=0.05。
+
+如果对象改变了大小，pattern 会自适应其大小，但是对象里面的内容不会自适应。所以当我们在 pattern 中还是放置 4 个重复的 pattern 时，组成 pattern 的对象将不会保持相同的大小，同时在他们之间会有大片空白区域。通过改变patternContentUnits属性，我们可以把所有的元素放到相同的单元系统中：
+
+```XML
+ <pattern id="Pattern" width=".25" height=".25" patternContentUnits="objectBoundingBox">
+   <rect x="0" y="0" width=".25" height=".25" fill="skyblue"/>
+   <rect x="0" y="0" width=".125" height=".125" fill="url(#Gradient2)"/>
+   <circle cx=".125" cy=".125" r=".1" fill="url(#Gradient1)" fill-opacity="0.5"/>
+ </pattern>
+```
+现在，因为 pattern 内容与 pattern 本身处于相同的单元系统中，所以我们不用偏移边框以使 pattern 在正确的位置上开始，并且即使对象变大，pattern 也会自动的缩放以保证 pattern 内部的对象数目和重复不变。这与 userSpaceOnUse 系统不同，userSpaceOnUse 系统中如果对象改变大小，pattern 本身会保持不变，只是重复更多次去填满边框。
+
+它有一点点的副作用，在 Gecko 中的圆如果半径设置得小于 0.075（尽管半径应该设置的比这个值大得多。这个可能是 pattern 元素中的一个 bug，或者也不算 bug，我也不太清楚）的话绘制的时候可能会出现问题，为了规避这个问题，可能最好的办法是尽量避免在 objectBoundingBox 单元中绘制图形。
+
+在你想要使用 pattern 的时候，可能你并不中意这些方法中的任何一个，Pattern 通常都是有确认的大小并且重复他们自己，与对象形状独立开来。要想创建这种 pattern，pattern 和它的内容必须在当前用户空间中绘制，这样当对象在做如下操作时他们才不会改变形状：
+
+```XML
+ <pattern id="Pattern" x="10" y="10" width="50" height="50" patternUnits="userSpaceOnUse">
+   <rect x="0" y="0" width="50" height="50" fill="skyblue"/>
+   <rect x="0" y="0" width="25" height="25" fill="url(#Gradient2)"/>
+   <circle cx="25" cy="25" r="20" fill="url(#Gradient1)" fill-opacity="0.5"/>
+ </pattern>
+```
+
+当然，这意味着如果你后续改变了对象大小，pattern 也不会缩放。上述三个举例在下图中放在一个矩形中展示，高度被轻微拉伸到 300px，但是我注意到这不是完整的图片，并且有些其他选项可能你的应用不支持。
+
+<svg width="100%" height="200">
+  <rect width="100%" height="100%" fill="rgb(230,230,230)" rx="5"/>
+  <pattern id="Pattern" x="10" y="10" width="50"        height="50" patternUnits="userSpaceOnUse">
+   <rect x="0" y="0" width="50" height="50" fill="skyblue"/>
+   <rect x="0" y="0" width="25" height="25" fill="url(#Gradient2)"/>
+   <circle cx="25" cy="25" r="20" fill="url(#Gradient1)" fill-opacity="0.5"/>
+ </pattern>
+  <rect x="2.5%" y="2.5%" width="30%" height="95%" fill="url(#Pattern)"/>
+</svg>
