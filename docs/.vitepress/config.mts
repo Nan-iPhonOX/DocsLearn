@@ -21,7 +21,7 @@ export default defineConfig({
     },
 
     editLink: {
-      pattern: ":path",
+      pattern: "https://github.com/Nan-iPhonOX/DocsLearn/edit/main/docs/:path",
       text: "编辑此页面",
     },
 
