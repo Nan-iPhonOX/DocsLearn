@@ -1,4 +1,5 @@
-import { defineConfig } from "vitepress";
+import { defineConfig, type DefaultTheme} from "vitepress";
+import { sidebarMDN , glossary} from "./MDN";
 
 export default defineConfig({
   head: [['link', { rel: 'icon', href: '/DocsLearn/favicon.ico' }]],
@@ -18,6 +19,7 @@ export default defineConfig({
         base: "/PressReference/",
         items: sidebarReference(),
       },
+      "MDN":{base:"/MDN/",items:sidebarMDN()}
     },
 
     editLink: {
@@ -56,7 +58,7 @@ export default defineConfig({
   },
 });
 
-function nav() {
+function nav():DefaultTheme.NavItem[] {
   return [
     {
       text: "Learn",
@@ -76,7 +78,7 @@ function nav() {
   ];
 }
 
-function sidebarGuide() {
+function sidebarGuide():DefaultTheme.SidebarItem[] {
   return [
     {
       text: "简介",
@@ -122,7 +124,7 @@ function sidebarGuide() {
   ];
 }
 
-function sidebarLearn() {
+function sidebarLearn():DefaultTheme.SidebarItem[] {
   return [
     {
       text:"学习",
@@ -134,7 +136,7 @@ function sidebarLearn() {
   ]
 }
 
-function sidebarReference() {
+function sidebarReference():DefaultTheme.SidebarItem[] {
   return [
     {
       text: "参考",
