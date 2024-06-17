@@ -53,20 +53,22 @@
 
 :::details 答案
 裂缝修补施工流程:裂缝检查 → 裂缝表面清理 → 封缝胶配制 → 粘贴注浆嘴 → 裂缝封闭 → 注浆胶配制一注浆（同时进行密封检查）→ 拆除注浆嘴 → 表面清理。
+
 <svg width="100%" height="200">
-    <defs>
-        <linearGradient id="Gradient2" x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0%" stop-color="skyblue" />
-            <stop offset="25%" stop-color="rgb(255,255,255)"/>
-            <stop offset="100%" stop-color="skyblue" />
-        </linearGradient>
-        <pattern id="q119" viewBox="20 34 100 100" width="100%" height="100%" stroke-linecap="round">
-            <path d="M20 40 V80 S40 95 60 80 V40" fill="url(#Gradient2)"/>
-            <ellipse cx="40" cy="40" rx="19" ry="5" stroke="red" stroke-width="2"/>
-        </pattern>
-    </defs>
-    <rect x="0" y="0" width="100" height="100" fill="url(#q119)"/>
+<defs>
+    <linearGradient id="Gradient2" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0%" stop-color="skyblue" />
+        <stop offset="25%" stop-color="rgb(255,255,255)"/>
+        <stop offset="100%" stop-color="skyblue" />
+    </linearGradient>
+    <pattern id="q119" viewBox="20 34 100 100" width="100%" height="100%" stroke-linecap="round">
+        <path d="M20 40 V80 S40 95 60 80 V40" fill="url(#Gradient2)"/>
+        <ellipse cx="40" cy="40" rx="19" ry="5" stroke="red" stroke-width="2"/>
+    </pattern>
+</defs>
+<rect x="0" y="0" width="100" height="100" fill="url(#q119)"/>
 </svg>
+
 :::
 
 ### 120 铁路新设备（包括改造后的设备）投入使用前必须做好哪些工作?
@@ -186,3 +188,53 @@
 :::details 答案
 运营中钢梁保护涂装起泡、裂纹或脱落的面积达 25%，点锈面积达 5%，粉化劣化达 4 级且底漆已失效时，应进行整孔重新涂装。
 :::
+
+# 6月
+
+:::tip 业务学习
+必知必会114~123题。
+:::
+
+:::tip 岗位练兵
+高铁桥梁钢结构油漆。
+:::
+
+## 2024 年 6 月 17 日
+
+### 25.隧道漏水整治应遵循什么原则？
+
+:::details 答案
+隧道内有漏水时，应查明水源、漏水位置及漏水量，查阅原防水、排水系统的设计、施工、验收资料。遵循“防、堵、截、排，因地制宜，综合治理”的原则进行整治。
+:::
+
+### 26.使用移动作业架时怎样保证安全？
+
+:::details 答案
+使用移动作业架时，特别是移动作业架钩挂在桥梁钢支架人行道栏杆上时，应详细检查人行道、托架 U 形螺栓和作业架，同时应对人行道控制部位强度和梁体倾覆稳定性进行检算。未经检查或检算及检算结果不符合有关安全规定时，不得上架作业。人员攀登时应扶牢踩稳。未设置隔离设备时，严禁双层作业。
+:::
+
+### 27.高速铁路周边抽取地下水有何规定？
+
+:::details 答案
+高速铁路线路路堤坡脚、路堑坡顶或者铁路桥梁外侧起向外各 200m 范围内禁止抽取地下水。
+:::
+
+### 114.高速铁路防护墙有哪些技术标准？
+
+:::details 答案
+桥面设防护墙，不设护轮轨，有砟轨道防护墙兼作挡砟墙。线路中心至防护墙内侧净距，有砟轨道不应小于2.2m，无砟轨道不应小于1.9m。防护墙顶宽不应小于0.2m，顶面高程不低于相邻轨面，且不侵入限界。
+:::
+
+### 115.在哪些天气条件下严禁进行钢表面清理作业？
+
+:::details 答案
+钢表面清理，严禁在雨、雪、凝露和相对湿度大于80%及风沙天气进行。
+:::
+
+### 116.钢结构表面清理后应在多长时间内应涂装第一道底漆?
+
+:::details 答案
+钢结构表面清理后应在4h内涂装第一道底漆或电弧喷铝涂层，电弧喷铝完成后应立即覆盖封孔剂。
+:::
+
+
