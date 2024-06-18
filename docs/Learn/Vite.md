@@ -2,7 +2,7 @@
 
 ## 开箱即用
 
-不需要做任何额外的配置就可以使用vite。
+不需要做任何额外的配置就可以使用 vite。
 
 ## 基础语法
 
@@ -34,7 +34,7 @@
 在网站上动态渲染任意 HTML 是非常危险的，因为这非常容易造成 XSS 漏洞。请仅在内容安全可信时再使用 v-html，并且永远不要使用用户提供的 HTML 内容。
 :::
 
-#### Attribute 绑定​
+#### Attribute 绑定 ​
 
 双大括号不能在 HTML attributes 中使用。想要响应式地绑定一个 attribute，应该使用 v-bind 指令`：`
 
@@ -59,7 +59,7 @@ v-bind 指令指示 Vue 将元素的 id attribute 与组件的 dynamicId 属性�
 
 ```html
 <template>
-    <div id="testID"></div>
+  <div id="testID"></div>
 </template>
 ```
 
@@ -71,7 +71,7 @@ v-bind 指令指示 Vue 将元素的 id attribute 与组件的 dynamicId 属性�
 <div :id="dynamicId"></div>
 ```
 
-开头为` : `的 attribute 可能和一般的 HTML attribute 看起来不太一样，但它的确是合法的 attribute 名称字符，并且所有支持 Vue 的浏览器都能正确解析它。此外，他们不会出现在最终渲染的 DOM 中。简写语法是可选的，但相信在你了解了它更多的用处后，你应该会更喜欢它。
+开头为`:`的 attribute 可能和一般的 HTML attribute 看起来不太一样，但它的确是合法的 attribute 名称字符，并且所有支持 Vue 的浏览器都能正确解析它。此外，他们不会出现在最终渲染的 DOM 中。简写语法是可选的，但相信在你了解了它更多的用处后，你应该会更喜欢它。
 
 #### 同名简写
 
@@ -101,9 +101,9 @@ v-bind 指令指示 Vue 将元素的 id attribute 与组件的 dynamicId 属性�
 
 ```js
 const objectOfAttrs = {
-  id: 'container',
-  class: 'wrapper'
-}
+  id: "container",
+  class: "wrapper",
+};
 ```
 
 通过不带参数的 v-bind，你可以将它们绑定到单个元素上：
@@ -117,11 +117,8 @@ const objectOfAttrs = {
 至此，我们仅在模板中绑定了一些简单的属性名。但是 Vue 实际上在所有的数据绑定中都支持完整的 JavaScript 表达式：
 
 ```html
-{{ number + 1 }}
-
-{{ ok ? 'YES' : 'NO' }}
-
-{{ message.split('').reverse().join('') }}
+{{ number + 1 }} {{ ok ? 'YES' : 'NO' }} {{ message.split('').reverse().join('')
+}}
 
 <div :id="`list-${id}`"></div>
 ```
@@ -133,7 +130,7 @@ const objectOfAttrs = {
 1. 在文本插值中 (双大括号)
 2. 在任何 Vue 指令 (以 v- 开头的特殊 attribute) attribute 的值中
 
-#### 仅支持表达式​
+#### 仅支持表达式 ​
 
 每个绑定仅支持单一表达式，也就是一段能够被求值的 JavaScript 代码。一个简单的判断方法是是否可以合法地写在 return 后面。
 
@@ -203,7 +200,7 @@ const objectOfAttrs = {
 
 这里的参数是要监听的事件名称：click。v-on 有一个相应的缩写，即 @ 字符。我们之后也会讨论关于事件处理的更多细节。
 
-#### 动态参数​
+#### 动态参数 ​
 
 同样在指令参数上也可以使用一个 JavaScript 表达式，需要包含在一对方括号内：
 
@@ -231,10 +228,12 @@ const objectOfAttrs = {
 
 在此示例中，当 `eventName` 的值是 `"focus"` 时，`v-on:[eventName]` 就等价于 `v-on:focus`。
 
-#### 动态参数值的限制​
+#### 动态参数值的限制 ​
+
 动态参数中表达式的值应当是一个字符串，或者是 null。特殊值 null 意为显式移除该绑定。其他非字符串的值会触发警告。
 
-#### 动态参数语法的限制​
+#### 动态参数语法的限制 ​
+
 动态参数表达式因为某些字符的缘故有一些语法限制，比如空格和引号，在 HTML attribute 名称中都是不合法的。例如下面的示例：
 
 ```html
@@ -271,42 +270,42 @@ const objectOfAttrs = {
 在组合式 API 中，推荐使用 `ref()` 函数来声明响应式状态：
 
 ```ts
-import { ref } from 'vue'
+import { ref } from "vue";
 
-const count = ref(0)
+const count = ref(0);
 ```
 
 ref() 接收参数，并将其包裹在一个带有 .value 属性的 ref 对象中返回：
 
 ```ts
-const count = ref(0)
+const count = ref(0);
 
-console.log(count) // { value: 0 }
-console.log(count.value) // 0
+console.log(count); // { value: 0 }
+console.log(count.value); // 0
 
-count.value++
-console.log(count.value) // 1
+count.value++;
+console.log(count.value); // 1
 ```
+
 要在组件模板中访问 ref，请从组件的 setup() 函数中声明并返回它们：
 
 ```ts
-import { ref } from 'vue'
+import { ref } from "vue";
 
 export default {
   // `setup` 是一个特殊的钩子，专门用于组合式 API。
   setup() {
-    const count = ref(0)
+    const count = ref(0);
 
     // 将 ref 暴露给模板
     return {
-      count
-    }
-  }
-}
+      count,
+    };
+  },
+};
 ```
 
 ```html
-
 <div>{{ count }}</div>
 ```
 
@@ -315,40 +314,36 @@ export default {
 你也可以直接在事件监听器中改变一个 ref：
 
 ```html
-<button @click="count++">
-  {{ count }}
-</button>
+<button @click="count++">{{ count }}</button>
 ```
 
 对于更复杂的逻辑，我们可以在同一作用域内声明更改 ref 的函数，并将它们作为方法与状态一起公开：
 
 ```ts
-import { ref } from 'vue'
+import { ref } from "vue";
 
 export default {
   setup() {
-    const count = ref(0)
+    const count = ref(0);
 
     function increment() {
       // 在 JavaScript 中需要 .value
-      count.value++
+      count.value++;
     }
 
     // 不要忘记同时暴露 increment 函数
     return {
       count,
-      increment
-    }
-  }
-}
+      increment,
+    };
+  },
+};
 ```
 
 然后，暴露的方法可以被用作事件监听器：
 
 ```html
-<button @click="increment">
-  {{ count }}
-</button>
+<button @click="increment">{{ count }}</button>
 ```
 
 这里是 Codepen 上的例子，没有使用任何构建工具。
@@ -392,38 +387,38 @@ function increment() {
 const myRef = {
   _value: 0,
   get value() {
-    track()
-    return this._value
+    track();
+    return this._value;
   },
   set value(newValue) {
-    this._value = newValue
-    trigger()
-  }
-}
+    this._value = newValue;
+    trigger();
+  },
+};
 ```
 
 另一个 ref 的好处是，与普通变量不同，你可以将 ref 传递给函数，同时保留对最新值和响应式连接的访问。当将复杂的逻辑重构为可重用的代码时，这将非常有用。
 
 该响应性系统在深入响应式原理章节中有更详细的讨论。
 
-#### 深层响应性​
+#### 深层响应性 ​
 
 Ref 可以持有任何类型的值，包括深层嵌套的对象、数组或者 JavaScript 内置的数据结构，比如 Map。
 
 Ref 会使它的值具有`深层响应性`。这意味着即使改变嵌套对象或数组时，变化也会被检测到：
 
 ```js
-import { ref } from 'vue'
+import { ref } from "vue";
 
 const obj = ref({
   nested: { count: 0 },
-  arr: ['foo', 'bar']
-})
+  arr: ["foo", "bar"],
+});
 
 function mutateDeeply() {
   // 以下都会按照期望工作
-  obj.value.nested.count++
-  obj.value.arr.push('baz')
+  obj.value.nested.count++;
+  obj.value.arr.push("baz");
 }
 ```
 
@@ -438,11 +433,11 @@ function mutateDeeply() {
 要等待 DOM 更新完成后再执行额外的代码，可以使用 nextTick() 全局 API：
 
 ```js
-import { nextTick } from 'vue'
+import { nextTick } from "vue";
 
 async function increment() {
-  count.value++
-  await nextTick()
+  count.value++;
+  await nextTick();
   // 现在 DOM 已经更新了
 }
 ```
@@ -452,15 +447,13 @@ async function increment() {
 还有另一种声明响应式状态的方式，即使用 reactive() API。与将内部值包装在特殊对象中的 ref 不同，reactive() 将使对象本身具有响应性：
 
 ```ts
-import { reactive } from 'vue'
+import { reactive } from "vue";
 
-const state = reactive({ count: 0 })
+const state = reactive({ count: 0 });
 ```
 
 ```html
-<button @click="state.count++">
-  {{ state.count }}
-</button>
+<button @click="state.count++">{{ state.count }}</button>
 ```
 
 响应式对象是 JavaScript 代理，其行为就和普通对象一样。不同的是，Vue 能够拦截对响应式对象所有属性的访问和修改，以便进行依赖追踪和触发更新。
@@ -472,13 +465,39 @@ reactive() 将深层地转换对象：当访问嵌套对象时，它们也会被
 值得注意的是，reactive() 返回的是一个原始对象的 Proxy，它和原始对象是不相等的：
 
 ```js
-const raw = {}
-const proxy = reactive(raw)
+const raw = {};
+const proxy = reactive(raw);
 
 // 代理对象和原始对象不是全等的
-console.log(proxy === raw) // false
+console.log(proxy === raw); // false
 ```
 
 只有代理对象是响应式的，更改原始对象不会触发更新。因此，使用 Vue 的响应式系统的最佳实践是仅使用你声明对象的代理版本。
 
 为保证访问代理的一致性，对同一个原始对象调用 reactive() 会总是返回同样的代理对象，而对一个已存在的代理对象调用 reactive() 会返回其本身：
+
+#### v-on
+
+<input type="text" v-on:click="add"/>
+
+#### v-show
+
+<p>当前状态：{{ web.show }}</p><hr>
+<p v-show="web.show">显示</p>
+<button @:click="toggle">切换{{ status }}</button>
+
+<script setup>
+    import {reactive, ref} from 'vue'
+    const web = reactive({
+      show:true
+    })
+    const status = ref("隐藏")   
+    const count = ref(0)
+    function add(){
+        add++
+    }
+    function toggle(){
+        web.show = !web.show
+        status.value=web.show?"隐藏":"显示"
+    }
+</script>
