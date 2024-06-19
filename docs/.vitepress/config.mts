@@ -1,6 +1,5 @@
 import { defineConfig, type DefaultTheme} from "vitepress";
 import { sidebarMDN , glossary} from "./MDN";
-
 export default defineConfig({
   head: [['link', { rel: 'icon', href: '/DocsLearn/favicon.ico' }]],
   lang: "zh-Hans",

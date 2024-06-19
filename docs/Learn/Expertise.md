@@ -14,21 +14,6 @@
 :::details 答案
 裂缝修补施工流程:裂缝检查 → 裂缝表面清理 → 封缝胶配制 → 粘贴注浆嘴 → 裂缝封闭 → 注浆胶配制一注浆（同时进行密封检查）→ 拆除注浆嘴 → 表面清理。
 
-<svg width="100%" height="200">
-<defs>
-    <linearGradient id="Gradient2" x1="0" x2="1" y1="0" y2="0">
-        <stop offset="0%" stop-color="skyblue" />
-        <stop offset="25%" stop-color="rgb(255,255,255)"/>
-        <stop offset="100%" stop-color="skyblue" />
-    </linearGradient>
-    <pattern id="q119" viewBox="20 34 100 100" width="100%" height="100%" stroke-linecap="round">
-        <path d="M20 40 V80 S40 95 60 80 V40" fill="url(#Gradient2)"/>
-        <ellipse cx="40" cy="40" rx="19" ry="5" stroke="red" stroke-width="2"/>
-    </pattern>
-</defs>
-<rect x="0" y="0" width="100" height="100" fill="url(#q119)"/>
-</svg>
-
 :::
 
 ### 120 铁路新设备（包括改造后的设备）投入使用前必须做好哪些工作?

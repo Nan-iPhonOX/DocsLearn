@@ -16,7 +16,7 @@ hero:
       text: 使用参考
       link: /PressGuide/getting-started
   image:
-      src: /阅读书籍.png
+      src: /log-large.svg
       alt: 认真学习
 
 features:
