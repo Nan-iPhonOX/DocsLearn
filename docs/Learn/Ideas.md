@@ -259,6 +259,6 @@ Expires: 0
 
 ### 写一个vitepress自动目录函数
 
-<<< @/.vitepress/generateSideBar.mts{2}
+<<< @/.vitepress/AutoSideBar.ts
 
 ### 写一个修改单元格内字符颜色的command

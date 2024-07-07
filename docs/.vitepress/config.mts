@@ -1,7 +1,5 @@
 import { defineConfig, type DefaultTheme} from "vitepress";
-import { sidebarMDN , glossary} from "./MDN";
-import {resolve} from "node:path"
-import  sidebar  from "./generateSideBar.mjs";
+import  GenerateSideBar  from "./AutoSideBar";
 
 export default defineConfig({
   head: [['link', { rel: 'icon', href: '/DocsLearn/favicon.ico' }]],
@@ -15,13 +13,12 @@ export default defineConfig({
       provider:'local'
     },
     sidebar: {
-      "Learn":sidebar(`Learn`),
+      "Learn":GenerateSideBar(`Learn`),
       "PressGuide": { base: "/PressGuide/", items: sidebarGuide() },
       "/PressReference/": {
         base: "/PressReference/",
         items: sidebarReference(),
-      },
-      "MDN":{base:"/MDN/",items:sidebarMDN()}
+      }
     },
 
     editLink: {
@@ -57,7 +54,7 @@ export default defineConfig({
     darkModeSwitchLabel: "主题",
     lightModeSwitchTitle: "切换到浅色模式",
     darkModeSwitchTitle: "切换到深色模式",
-  },
+  }
 });
 
 function nav():DefaultTheme.NavItem[] {
