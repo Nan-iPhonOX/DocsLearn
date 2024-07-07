@@ -5,7 +5,6 @@ const showModal = ref(false)
 
 <template>
   <button class="modal-button" @click="showModal = true">Show Modal</button>
-
   <Teleport to="body">
     <Transition name="modal">
       <div v-show="showModal" class="modal-mask">

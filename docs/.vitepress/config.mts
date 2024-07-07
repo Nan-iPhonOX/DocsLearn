@@ -1,5 +1,8 @@
 import { defineConfig, type DefaultTheme} from "vitepress";
 import { sidebarMDN , glossary} from "./MDN";
+import {resolve} from "node:path"
+import  sidebar  from "./generateSideBar.mjs";
+
 export default defineConfig({
   head: [['link', { rel: 'icon', href: '/DocsLearn/favicon.ico' }]],
   lang: "zh-Hans",
@@ -12,8 +15,8 @@ export default defineConfig({
       provider:'local'
     },
     sidebar: {
-      "Learn":{base:"/Learn/",items:sidebarLearn()},
-      "/PressGuide/": { base: "/PressGuide/", items: sidebarGuide() },
+      "Learn":sidebar(`Learn`),
+      "PressGuide": { base: "/PressGuide/", items: sidebarGuide() },
       "/PressReference/": {
         base: "/PressReference/",
         items: sidebarReference(),

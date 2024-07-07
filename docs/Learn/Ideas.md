@@ -1,4 +1,4 @@
-# IDEAs
+# IDEAs 奇思
 
 ## svg
 
@@ -255,5 +255,10 @@ Expires: 0
 
 #### tensorflow C++ 框架
 
-
 ### 在opencv上画位置
+
+### 写一个vitepress自动目录函数
+
+<<< @/.vitepress/generateSideBar.mts{2}
+
+### 写一个修改单元格内字符颜色的command
