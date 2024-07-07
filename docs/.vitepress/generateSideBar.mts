@@ -16,7 +16,7 @@ function generateSideBar(
   directory: string,
   base: string,
 ) {
-  const basePath = resolve(__dirname, "../");
+  const basePath = resolve(__dirname, `../${base}`);
   const sidebar: any = {
     text: getMdTitle(directory),
     items: [],
@@ -24,9 +24,9 @@ function generateSideBar(
   const child = sidebar.items;
   const folder = readdirSync(directory);
   for (const file of folder) {
-    const fullPath = join(directory, file);
+    const fullPath =join(directory, file);
     const stat = statSync(fullPath);
-
+    
     if (stat.isDirectory()) {
       child.push(generateSideBar(fullPath, base));
     }
@@ -36,7 +36,7 @@ function generateSideBar(
         link: `${resolve(fullPath)
           .replace(basePath, "")
           .replace(".md", "")
-          .replace(base, "")}`,
+          .slice(1)}`,
       });
     }
   }
@@ -46,10 +46,10 @@ function generateSideBar(
 export default function makeSidebar(FolderName: string) {
   return {
     base: `/${FolderName}/`,
-    items: [generateSideBar(resolve(__dirname, `../${FolderName}`), `\\${FolderName}\\`)],
+    items: [generateSideBar(resolve(__dirname, `../${FolderName}`), `${FolderName}`)],
   };
 }
 
 console.log(
-  makeSidebar(`PressGuide`)
+  makeSidebar(`Learn`).items[0].items[2]
 );
