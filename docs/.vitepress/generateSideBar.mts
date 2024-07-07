@@ -9,7 +9,7 @@ const getMdTitle = (md: string) => {
     const titleMatch = MdContent.match(/^# (.*)$/m);
     return titleMatch ? titleMatch[1] : null;
   }
-  return resolve(md).split(`\\`).reverse()[1].toUpperCase();
+  return resolve(md).split(`\\`).reverse()[1];
 };
 
 function generateSideBar(
