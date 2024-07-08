@@ -18,10 +18,9 @@ function generateSideBar(
     const fullPath = resolve(FindDir, file);
     const stat = statSync(fullPath);
     if (stat.isDirectory()) {
-      result[0].items?.push({
-        text: getMdTitle(fullPath),
-        items: generateSideBar(FolderName, fullPath),
-      });
+      (generateSideBar(FolderName, fullPath)).forEach(
+        item=>result[0].items?.push(item)
+      )
     } else if (
       stat.isFile() &&
       file.endsWith(`.md`) &&
@@ -58,3 +57,7 @@ export default function makeSidebar(FolderName: string) {
   };
 }
 
+
+console.log(
+  makeSidebar("Learn").items[0]
+);
