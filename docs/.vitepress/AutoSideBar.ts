@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "fs";
-import { resolve } from "node:path";
+import { resolve,basename } from "node:path";
 import { DefaultTheme } from "vitepress";
 
 function generateSideBar(
@@ -22,26 +22,25 @@ function generateSideBar(
       file.endsWith(`.md`) &&
       !file.endsWith(`index.md`)
     ) {
-      result.push(
-        {
-          text: getMdTitle(fullPath),
-          link: fullPath.replace(docs, "").slice(1).replace(".md", ""),
-        },
-      );
+      result.push({
+        text: getMdTitle(fullPath),
+        link: fullPath.replace(docs, "").slice(1).replace(".md", ""),
+      });
     }
   }
   return result;
 }
 
 const getMdTitle = (md: string) => {
-  if (!md.endsWith(".md")) md = resolve(md, "./index.md");
 
+  if (!md.endsWith(".md")) md = resolve(md, "./index.md");
+  
   if (existsSync(md)) {
     const MdContent = readFileSync(md, "utf8");
     const titleMatch = MdContent.match(/^# (.*)$/m);
     return titleMatch ? titleMatch[1] : undefined;
   }
-  return resolve(md).split(`\\`).reverse()[1];
+  return basename(resolve(md,`..`));
 };
 
 export default function makeSidebar(FolderName: string) {
@@ -54,3 +53,4 @@ export default function makeSidebar(FolderName: string) {
   };
 }
 
+console.log(getMdTitle("X:\\Documents\\VitePress\\docs\\Learn"));
