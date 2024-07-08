@@ -8,12 +8,17 @@ function generateSideBar(
 ): DefaultTheme.SidebarItem[] {
   const docs = resolve(__dirname, `../${FolderName}`);
   const files = readdirSync(FindDir);
-  const result: DefaultTheme.SidebarItem[] = [];
+  const result: DefaultTheme.SidebarItem[] = [
+    {
+      text:getMdTitle(FindDir),
+      items:[]
+    }
+  ];
   for (const file of files) {
     const fullPath = resolve(FindDir, file);
     const stat = statSync(fullPath);
     if (stat.isDirectory()) {
-      result.push({
+      result[0].items?.push({
         text: getMdTitle(fullPath),
         items: generateSideBar(FolderName, fullPath),
       });
@@ -22,7 +27,7 @@ function generateSideBar(
       file.endsWith(`.md`) &&
       !file.endsWith(`index.md`)
     ) {
-      result.push({
+      result[0].items?.push({
         text: getMdTitle(fullPath),
         link: fullPath.replace(docs, "").slice(1).replace(".md", ""),
       });
@@ -53,4 +58,3 @@ export default function makeSidebar(FolderName: string) {
   };
 }
 
-console.log(getMdTitle("X:\\Documents\\VitePress\\docs\\Learn"));
