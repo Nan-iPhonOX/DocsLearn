@@ -262,3 +262,9 @@ Expires: 0
 <<< @/.vitepress/AutoSideBar.ts
 
 ### 写一个修改单元格内字符颜色的command
+
+xllsdk 无法实现该功能。
+
+### 分布式服务器
+
+熟悉服务器开发

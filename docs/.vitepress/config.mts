@@ -1,6 +1,5 @@
 import { defineConfig, type DefaultTheme} from "vitepress";
 import  GenerateSideBar  from "./AutoSideBar";
-
 export default defineConfig({
   head: [['link', { rel: 'icon', href: '/DocsLearn/favicon.ico' }]],
   lang: "zh-Hans",
@@ -14,10 +13,12 @@ export default defineConfig({
     },
     sidebar: {
       "Learn":GenerateSideBar(`Learn`),
+      "XLLSDK":GenerateSideBar(`XLLSDK`),
+      "GitLearn":GenerateSideBar(`GitLearn`),
       "PressGuide": { base: "/PressGuide/", items: sidebarGuide() },
       "/PressReference/": {
         base: "/PressReference/",
-        items: sidebarReference(),
+        items: sidebarReference()
       }
     },
 
@@ -54,6 +55,10 @@ export default defineConfig({
     darkModeSwitchLabel: "主题",
     lightModeSwitchTitle: "切换到浅色模式",
     darkModeSwitchTitle: "切换到深色模式",
+  },
+  vite:{
+    plugins:[
+    ]
   }
 });
 
@@ -61,7 +66,7 @@ function nav():DefaultTheme.NavItem[] {
   return [
     {
       text: "Learn",
-      link: "/Learn/Expertise",
+      link: "/Learn/2024年5月",
       activeMatch: "/Learn/",
     },
     {
