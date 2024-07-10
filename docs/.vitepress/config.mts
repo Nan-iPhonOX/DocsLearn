@@ -1,68 +1,72 @@
-import { defineConfig, type DefaultTheme} from "vitepress";
-import  GenerateSideBar  from "./AutoSideBar";
-export default defineConfig({
-  head: [['link', { rel: 'icon', href: '/DocsLearn/favicon.ico' }]],
-  lang: "zh-Hans",
-  title: "图书馆",
-  description: "由 Vite 和 Vue 驱动的静态站点生成器",
-  base:'/DocsLearn/',
-  themeConfig: {
-    nav: nav(),
-    search:{
-      provider:'local'
-    },
-    sidebar: {
-      "Learn":GenerateSideBar(`Learn`),
-      "XLLSDK":GenerateSideBar(`XLLSDK`),
-      "GitLearn":GenerateSideBar(`GitLearn`),
-      "PressGuide": { base: "/PressGuide/", items: sidebarGuide() },
-      "/PressReference/": {
-        base: "/PressReference/",
-        items: sidebarReference()
-      }
-    },
-
-    editLink: {
-      pattern: "https://github.com/Nan-iPhonOX/DocsLearn/edit/main/docs/:path",
-      text: "编辑此页面",
-    },
-
-    footer: {
-      message: "For Miss Li.",
-      copyright: `教资2019-${new Date().getFullYear()}`,
-    },
-
-    docFooter: {
-      prev: "上一页",
-      next: "下一页",
-    },
-
-    outline: {
-      label: "页面导航",
-    },
-
-    lastUpdated: {
-      text: "最后更新于",
-      formatOptions: {
-        dateStyle: "short",
-        timeStyle: "medium",
+import { defineConfig, type DefaultTheme } from "vitepress";
+import { withMermaid } from "vitepress-plugin-mermaid";
+import GenerateSideBar from "./AutoSideBar";
+export default withMermaid(
+  defineConfig({
+    head: [["link", { rel: "icon", href: "/DocsLearn/favicon.ico" }]],
+    lang: "zh-Hans",
+    title: "图书馆",
+    description: "由 Vite 和 Vue 驱动的静态站点生成器",
+    base: "/DocsLearn/",
+    themeConfig: {
+      nav: nav(),
+      search: {
+        provider: "local",
       },
+      sidebar: {
+        Learn: GenerateSideBar(`Learn`),
+        XLLSDK: GenerateSideBar(`XLLSDK`),
+        GitLearn: GenerateSideBar(`GitLearn`),
+        CppPrimerV5: GenerateSideBar(`CppPrimerV5`),
+        PressGuide: { base: "/PressGuide/", items: sidebarGuide() },
+        "/PressReference/": {
+          base: "/PressReference/",
+          items: sidebarReference(),
+        },
+      },
+
+      editLink: {
+        pattern:
+          "https://github.com/Nan-iPhonOX/DocsLearn/edit/main/docs/:path",
+        text: "编辑此页面",
+      },
+
+      footer: {
+        message: "For Miss Li.",
+        copyright: `教资2019-${new Date().getFullYear()}`,
+      },
+
+      docFooter: {
+        prev: "上一页",
+        next: "下一页",
+      },
+
+      outline: {
+        label: "页面导航",
+      },
+
+      lastUpdated: {
+        text: "最后更新于",
+        formatOptions: {
+          dateStyle: "short",
+          timeStyle: "medium",
+        },
+      },
+
+      langMenuLabel: "多语言",
+      returnToTopLabel: "回到顶部",
+      sidebarMenuLabel: "菜单",
+      darkModeSwitchLabel: "主题",
+      lightModeSwitchTitle: "切换到浅色模式",
+      darkModeSwitchTitle: "切换到深色模式",
     },
+    vite: {
+      plugins: [],
+    },
+  })
+);
 
-    langMenuLabel: "多语言",
-    returnToTopLabel: "回到顶部",
-    sidebarMenuLabel: "菜单",
-    darkModeSwitchLabel: "主题",
-    lightModeSwitchTitle: "切换到浅色模式",
-    darkModeSwitchTitle: "切换到深色模式",
-  },
-  vite:{
-    plugins:[
-    ]
-  }
-});
-
-function nav():DefaultTheme.NavItem[] {
+function nav(): DefaultTheme.NavItem[] {
   return [
     {
       text: "Learn",
@@ -82,7 +86,7 @@ function nav():DefaultTheme.NavItem[] {
   ];
 }
 
-function sidebarGuide():DefaultTheme.SidebarItem[] {
+function sidebarGuide(): DefaultTheme.SidebarItem[] {
   return [
     {
       text: "简介",
@@ -128,19 +132,19 @@ function sidebarGuide():DefaultTheme.SidebarItem[] {
   ];
 }
 
-function sidebarLearn():DefaultTheme.SidebarItem[] {
+function sidebarLearn(): DefaultTheme.SidebarItem[] {
   return [
     {
-      text:"学习",
-      items:[
-        {text: "业务学习",link: "Expertise"},
-        {text: "SVG",link: "SVG"}
+      text: "学习",
+      items: [
+        { text: "业务学习", link: "Expertise" },
+        { text: "SVG", link: "SVG" },
       ],
-    }
-  ]
+    },
+  ];
 }
 
-function sidebarReference():DefaultTheme.SidebarItem[] {
+function sidebarReference(): DefaultTheme.SidebarItem[] {
   return [
     {
       text: "参考",
