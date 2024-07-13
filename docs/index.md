@@ -11,7 +11,7 @@ hero:
   actions:
     - theme: brand
       text: 每日一学
-      link: /Learn/Expertise
+      link: /Learn/2024年5月
     - theme: alt
       text: 使用参考
       link: /PressGuide/getting-started

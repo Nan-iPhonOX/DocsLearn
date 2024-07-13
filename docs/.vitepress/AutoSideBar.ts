@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "fs";
-import { resolve, basename, normalize,} from "node:path";
+import { resolve, basename, normalize } from "node:path";
 import { DefaultTheme } from "vitepress";
 
 function generateSideBar(
@@ -41,7 +41,7 @@ const getMdTitle = (md: string) => {
   if (existsSync(md)) {
     const MdContent = readFileSync(md, "utf8");
     const titleMatch = MdContent.match(/^# (.*)$/m);
-    return titleMatch ? titleMatch[1] :  basename(md.replace(".md",""));
+    return titleMatch ? titleMatch[1] : basename(md.replace(".md", ""));
   }
   return basename(resolve(md, `..`));
 };
