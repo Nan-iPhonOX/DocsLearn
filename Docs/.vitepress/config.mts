@@ -1,12 +1,13 @@
 import { defineConfig, type DefaultTheme } from "vitepress";
+import { withMermaid } from "vitepress-plugin-mermaid";
 import GenerateSideBar from "./AutoSideBar";
-export default 
+export default withMermaid(
   defineConfig({
     head: [["link", { rel: "icon", href: "/DocsLearn/favicon.ico" }]],
     lang: "zh-Hans",
     title: "图书馆",
     description: "由 Vite 和 Vue 驱动的静态站点生成器",
-    
+
     base: "/DocsLearn/",
     themeConfig: {
       nav: nav(),
@@ -59,12 +60,8 @@ export default
       darkModeSwitchLabel: "主题",
       lightModeSwitchTitle: "切换到浅色模式",
       darkModeSwitchTitle: "切换到深色模式",
-    },
-    vite: {
-      plugins: [],
-    },
-  })
-;
+    }
+  }));
 
 function nav(): DefaultTheme.NavItem[] {
   return [

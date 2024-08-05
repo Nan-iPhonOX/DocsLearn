@@ -3,3 +3,4 @@ Docs/.vitepress/cache/
 Docs/.vitepress/dist
 Docs/public/SVGs/log-in-girl.*
 Docs/public/SVGs/*.css
+*.swp

@@ -1,5 +1,5 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "fs";
-import { resolve, basename, normalize } from "node:path";
+import { resolve, basename } from "node:path";
 import { DefaultTheme } from "vitepress";
 
 function generateSideBar(
