@@ -1,5 +1,5 @@
 node_modules
-docs/.vitepress/cache/
-docs/.vitepress/dist
-docs/public/SVGs/log-in-girl.*
-docs/public/SVGs/*.css
+Docs/.vitepress/cache/
+Docs/.vitepress/dist
+Docs/public/SVGs/log-in-girl.*
+Docs/public/SVGs/*.css
