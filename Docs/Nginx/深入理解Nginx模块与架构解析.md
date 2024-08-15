@@ -22,7 +22,7 @@ Nginx 内存池在第 1 版中只是简单带过，第 2 版中新增了 8.7 节
 
 此外，很多读者反馈需要结合 TCP 来谈谈 Nginx，因此在 9.10 节中笔者试图在不陷入 Linux 内核细节的情况下，简要介绍了 TCP 以清晰了解 Nginx 的事件框架，了解 Nginx 的高并发能力。
 
-这一版新增的第 15 章的样例代码可以从http://nginx.taohui.org.cn 站点上下载。因笔者工作繁忙，以致第 2 版拖稿严重，读者的邮件也无法及时回复，非常抱歉。从这版开始会把曾经的回复整理后放在网站上，想必这比回复邮件要更有效率些。读者对象本书适合以下读者阅读。
+这一版新增的第 15 章的样例代码可以从nginx.taohui.org.cn 站点上下载。因笔者工作繁忙，以致第 2 版拖稿严重，读者的邮件也无法及时回复，非常抱歉。从这版开始会把曾经的回复整理后放在网站上，想必这比回复邮件要更有效率些。读者对象本书适合以下读者阅读。
 
 - 对 Nginx 及如何将它搭建成一个高性能的 Web 服务器感兴趣的读者。
 
@@ -68,7 +68,7 @@ Nginx 是跨平台的服务器，然而这本书将只针对于最常见的 Linu
 
 ## 勘误和支持
 
-由于作者的水平有限，加之编写的时间也很仓促，书中难免会出现一些错误或者不准确的地方，恳请读者批评指正。为此，我特意创建了一个在线支持与应急方案的二级站点：http://nginx.weebly.com 。读者可以将书中的错误发布在 Bug 勘误表页面中，同时如果读者遇到任何问题，也可以访问 Q&A 页面，我将尽量在线上为读者提供最满意的解答。书中的全部源文件都将发布在这个网站上，我也会将相应的功能更新及时发布出来。如果你有更多的宝贵意见，也欢迎你发送邮件至我的邮箱russelltao@foxmail.com，期待能够听到读者的真挚反馈。
+由于作者的水平有限，加之编写的时间也很仓促，书中难免会出现一些错误或者不准确的地方，恳请读者批评指正。为此，我特意创建了一个在线支持与应急方案的二级站点：nginx.weebly.com 。读者可以将书中的错误发布在 Bug 勘误表页面中，同时如果读者遇到任何问题，也可以访问 Q&A 页面，我将尽量在线上为读者提供最满意的解答。书中的全部源文件都将发布在这个网站上，我也会将相应的功能更新及时发布出来。如果你有更多的宝贵意见，也欢迎你发送邮件至我的邮箱russelltao@foxmail.com，期待能够听到读者的真挚反馈。
 
 ## 致谢
 
@@ -138,7 +138,7 @@ Lighttpd，而国内的公司更青睐 Nginx，Lighttpd 使用得比较少。
 
 提示 Nginx 发音：engine 。
 
-来自俄罗斯的 Igor Sysoev 在为 Rambler Media（http://www.rambler.ru/ ）工作期间，使用 C 语言开发了 Nginx。Nginx 作为 Web 服务器，一直为俄罗斯著名的门户网站 Rambler Media 提供着出色、稳定的服务。
+来自俄罗斯的 Igor Sysoev 在为 Rambler Media（www.rambler.ru/ ）工作期间，使用 C 语言开发了 Nginx。Nginx 作为 Web 服务器，一直为俄罗斯著名的门户网站 Rambler Media 提供着出色、稳定的服务。
 
 Igor Sysoev 将 Nginx 的代码开源，并且赋予其最自由的 2-clause BSD-like license[2] 许可证。由于 Nginx 使用基于事件驱动的架构能够并发处理百万级别的 TCP 连接，高度模块化的设计和自由的许可证使得扩展 Nginx 功能的第三方模块层出不穷，而且优秀的设计带来了极佳的稳定性，因此其作为 Web 服务器被广泛应用到大流量的网站上，包括腾讯、新浪、网易、淘宝等访问量巨大的网站。
 
@@ -163,7 +163,7 @@ FreeBSD 上的 kqueue 等。
 务器。
 
 [1] 参见 Roy Fielding 博士的论文《Architectural Styles and the Design of Network-based Software
-Architectures》，可在http://www.ics.uci.edu/~f ielding/pubs/dissertation/top.htm 查看原文。
+Architectures》，可在www.ics.uci.edu/~f ielding/pubs/dissertation/top.htm 查看原文。
 
 [2] BSD（Berkeley Software Distribution）许可协议是自由软件（开源软件的一个子集）中使用
 最广泛的许可协议之一。与其他许可协议相比，BSD 许可协议从 GNU 通用公共许可协议
@@ -434,7 +434,7 @@ rmem_max、wmem_max 这 4 个参数的设置需要根据我们的业务特性以
 - tcp_syncookies：该参数与性能无关，用于解决 TCP 的 SYN 攻击。
 
   1.3.5 获取 Nginx 源码
-  可以在 Nginx 官方网站（http://nginx.org/en/download.html ）获取 Nginx 源码包。将下载的
+  可以在 Nginx 官方网站（nginx.org/en/download.html ）获取 Nginx 源码包。将下载的
   nginx-1.0.14.tar.gz 源码压缩包放置到准备好的 Nginx 源代码目录中，然后解压。例如：
   tar -zxvf nginx-1.0.14.tar.gz
   本书编写时的 Nginx 最新稳定版本为 1.0.14（如图 1-2 所示），本书后续部分都将以此版
@@ -1645,7 +1645,7 @@ index index.html htmlindex.php /index.php;
 的 URI 中。例如：
 error_page 404 404.html;
 error_page 502 503 504 50x.html;
-error_page 403 http://example.com/forbidden.html
+error_page 403 example.com/forbidden.html
 ;
 error_page 404 = @fetch;
 注意，虽然重定向了 URI，但返回的 HTTP 错误码还是与原来的相同。用户可以通
@@ -1661,10 +1661,10 @@ location / (
 error_page 404 @fallback;
 )
 location @fallback (
-proxy_pass http://backend
+proxy_pass backend
 ;
 )
-这样，返回 404 的请求会被反向代理到 http://backend 上游服务器中处理。
+这样，返回 404 的请求会被反向代理到 backend 上游服务器中处理。
 
 （5）是否允许递归使用 error_page
 语法： recursive_error_pages[on|off];
@@ -1681,11 +1681,11 @@ try_files 后要跟若干路径，如 path1 path2...，而且最后必须要有 
 uri 上。因此，最后这个参数 uri 必须存在，而且它应该是可以有效重定向的。例如：
 try_files systemmaintenance.html $uri $uri/index.html $uri.html @other;
 location @other {
-proxy_pass http://backend
+proxy_pass backend
 ;
 }
 上面这段代码表示如果前面的路径，如 systemmaintenance.html 等，都找不到，就会反向
-代理到 http://backend 服务上。还可以用指定错误码的方式与 error_page 配合使用，例如：
+代理到 backend 服务上。还可以用指定错误码的方式与 error_page 配合使用，例如：
 location {
 try_files $uri $uri /error.phpc=404 =404;
 }
@@ -2172,7 +2172,7 @@ server backend3.example.com;
 }
 server {
 location / {
-proxy_pass http://backend;
+proxy_pass backend;
 }
 }
 （2）server
@@ -2242,10 +2242,10 @@ log_format up_head '$remote_addr - $remote_user [$time_local] $request '
 配置块： location、if
 此配置项将当前请求反向代理到 URL 参数指定的服务器上，URL 可以是主机名或 IP 地址
 加端口的形式，例如：
-proxy_pass http://localhost:8000/uri/
+proxy_pass localhost:8000/uri/
 ;
 也可以是 UNIX 句柄：
-proxy_pass http://unix:/path/to/backend.socket:/uri/
+proxy_pass unix:/path/to/backend.socket:/uri/
 ;
 还可以如上节负载均衡中所示，直接使用 upstream 块，例如：
 upstream backend {
@@ -2253,7 +2253,7 @@ upstream backend {
 }
 server {
 location / {
-proxy_pass http://backend
+proxy_pass backend
 ;
 }
 }
@@ -2302,30 +2302,30 @@ proxy_pass_header X-Accel-Redirect;
 配置块： http、server、location
 当上游服务器返回的响应是重定向或刷新请求（如 HTTP 响应码是 301 或者 302）时，
 proxy_redirect 可以重设 HTTP 头部的 location 或 refresh 字段。例如，如果上游服务器发出的响
-应是 302 重定向请求，location 字段的 URI 是 http://localhost:8000/two/some/uri/ ，那么在下面的
-配置情况下，实际转发给客户端的 location 是 http://frontendonesome/uri/ 。
+应是 302 重定向请求，location 字段的 URI 是 `localhost:8000/two/some/uri/` ，那么在下面的
+配置情况下，实际转发给客户端的 location 是 `frontendonesome/uri/` 。
 
-proxy_redirect http://localhost:8000/two/
-http://frontendone;
+proxy_redirect localhost:8000/two/
+frontendone;
 这里还可以使用 ngx-http-core-module 提供的变量来设置新的 location 字段。例如：
-proxy_redirect http://localhost:8000/
-http://$host:$server_port/;
+proxy_redirect localhost:8000/
+$host:$server_port/;
 也可以省略 replacement 参数中的主机名部分，这时会用虚拟主机名称来填充。例如：
-proxy_redirect http://localhost:8000/two/one
+proxy_redirect localhost:8000/two/one
 ;
 使用 off 参数时，将使 location 或者 refresh 字段维持不变。例如：
 proxy_redirect off;
 使用默认的 default 参数时，会按照 proxy_pass 配置项和所属的 location 配置项重组发往客
 户端的 location 头部。例如，下面两种配置效果是一样的：
 location one {
-proxy_pass http://upstream:port/two/
+proxy_pass upstream:port/two/
 ;
 proxy_redirect default;
 }
 location one {
-proxy_pass http://upstream:port/two/
+proxy_pass upstream:port/two/
 ;
-proxy_redirect http://upstream:port/two/one
+proxy_redirect upstream:port/two/one
 ;
 }
 （8）proxy_next_upstream
@@ -2369,9 +2369,9 @@ upstream 机制，到那时，读者也许会发现 ngx_http_proxy_module 模块
 Nginx 由少量的核心框架代码和许多模块组成，每个模块都有它独特的功能。因此，读
 者可以通过查看每个模块实现了什么功能，来了解 Nginx 可以帮我们做些什么。
 
-Nginx 的 Wiki 网站（http://wiki.nginx.org/Modules ）上列出了官方提供的所有模块及配置
+Nginx 的 Wiki 网站（wiki.nginx.org/Modules ）上列出了官方提供的所有模块及配置
 项，仔细观察就会发现，这些配置项的语法与本章的内容都是很相近的，读者只需要弄清楚
-模块说明中每个配置项的意义即可。另外，网页http://wiki.nginx.org/3rdPartyModules 中列出
+模块说明中每个配置项的意义即可。另外，网页wiki.nginx.org/3rdPartyModules 中列出
 了 Wiki 上已知的几十个第三方模块，同时读者还可以从搜索引擎上搜索到更多的第三方模
 块。了解每个模块的配置项用法，并在 Nginx 中使用这些模块，可以让 Nginx 做到更多。
 
@@ -6318,7 +6318,7 @@ subrequest 实现的。
 假设我们生成的子请求是以 URI 为/list 开头的请求，使用 ngx*http_proxy_module 模块让子
 请求访问新浪的 hq.sinajs.cn 股票服务器，那么可以在 nginx.conf 中这样设置：
 location /list {
-proxy_pass http:// hq.sinajs.cn
+proxy_pass  hq.sinajs.cn
 ;
 /*不希望第三方服务发来的
 HTTP 包体做过
@@ -6678,7 +6678,7 @@ write_event_handler 回调方法。
 5.6 subrequest 使用的例子
 下面以一个简单的例子说明 subrequest 的用法。场景很简单，当使用浏览器访问/query?
 s_sh000001 时（s_sh000001 是新浪服务器上的 A 股上证指数），Nginx 由 mytest 模块处理，它会
-生成一个子请求，由反向代理模块处理这个子请求，访问新浪的http://hq.sinajs.cn 服务器，
+生成一个子请求，由反向代理模块处理这个子请求，访问新浪的hq.sinajs.cn 服务器，
 这时子请求得到的响应包是上证指数的当天价格交易量等信息，而 mytest 模块会解析这个响
 应，重新构造发往客户端浏览器的 HTTP 响应。浏览器得到的返回值格式为：stock[上证指
 数]，Today current price:2373.436,volumn:770。当然，如果传入的参数不仅是 s_sh000001，也
@@ -6698,7 +6698,7 @@ s_sh000001 时（s_sh000001 是新浪服务器上的 A 股上证指数），Ngin
 location /list {
 // 决定访问的上游服务器地址是
 hq.sinajs.cn
-proxy_pass http://hq.sinajs.cn
+proxy_pass hq.sinajs.cn
 ;
 // 不希望第三方服务发来的
 HTTP 包体进行过
@@ -20782,7 +20782,7 @@ ngx_http_core_preconfiguration, /* preconfiguration \_/
 };
 而这个方法中其实就干了一件事：调用 ngx_http_variables_add_core_vars 方法，把用于存
 放变量的结构体初始化，再将 Nginx 核心变量加入准备 hash 的数组 variables_keys 中。核心变量
-可以在http://nginx.org/cn/docs/http/ngx_http_core_module.html#variables 页面中查看，这里不再
+可以在nginx.org/cn/docs/http/ngx_http_core_module.html#variables 页面中查看，这里不再
 重复。
 
 在 15.1 节的例子中我们使用的变量$remote_addr 实际上就是 ngx_http_core_module 模块定
