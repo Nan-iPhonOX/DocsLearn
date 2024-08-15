@@ -16,6 +16,7 @@ export default withMermaid(
       },
       sidebar: {
         Learn: GenerateSideBar(`Learn`),
+        Nginx: GenerateSideBar(`Nginx`),
         XLLSDK: GenerateSideBar(`XLLSDK`),
         GitLearn: GenerateSideBar(`GitLearn`),
         CppPrimerV5: GenerateSideBar(`CppPrimerV5`),
