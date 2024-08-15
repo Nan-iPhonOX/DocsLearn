@@ -6,8 +6,8 @@ export default withMermaid(
     head: [["link", { rel: "icon", href: "/DocsLearn/favicon.ico" }]],
     lang: "zh-Hans",
     title: "图书馆",
+    base: "/DocsLearn/",
     description: "由 Vite 和 Vue 驱动的静态站点生成器",
-
     themeConfig: {
       nav: nav(),
       search: {
