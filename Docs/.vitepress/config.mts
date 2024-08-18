@@ -43,7 +43,7 @@ export default withMermaid(
       },
 
       outline: {
-        label: "页面导航",
+        label: "目录",
       },
 
       lastUpdated: {
