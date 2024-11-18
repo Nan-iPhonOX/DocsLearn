@@ -67,7 +67,7 @@ function nav(): DefaultTheme.NavItem[] {
   return [
     {
       text: "Learn",
-      link: "/Learn/2024年5月",
+      link: "/Learn/2024年05月",
       activeMatch: "/Learn/",
     },
     {
