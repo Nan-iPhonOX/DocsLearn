@@ -1,0 +1,1 @@
+![test](./public/SVGs/NGX_MODULE.svg)
