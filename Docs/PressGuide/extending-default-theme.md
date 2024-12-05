@@ -300,13 +300,6 @@ provide('toggle-appearance', async ({ clientX: x, clientY: y }: MouseEvent) => {
 
 Result (**warning!**: flashing colors, sudden movements, bright lights):
 
-<details>
-<summary>Demo</summary>
-
-![Appearance Toggle Transition Demo](/appearance-toggle-transition.webp)
-
-</details>
-
 有关视图过渡动画的更多详细信息，请参阅 [Chrome 文档](https://developer.chrome.com/docs/web-platform/view-transitions/)。
 
 ### 路由切换时 {#on-route-change}
