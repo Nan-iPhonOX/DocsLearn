@@ -8,7 +8,8 @@
   "scripts": {
     "docs:dev": "vitepress dev Docs --host 0.0.0.0",
     "docs:build": "vitepress build Docs",
-    "docs:preview": "vitepress preview Docs"
+    "docs:preview": "vitepress preview Docs",
+    "deploy": "rsync -avz --delete --chown root:root  /home/crazy/VitePress/Docs/.vitepress/dist/ root@113.44.162.11:/usr/local/nginx/html"
   },
   "packageManager": "pnpm@9.6.0"
 }
