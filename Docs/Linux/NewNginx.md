@@ -549,6 +549,7 @@ systemctl start Nginx
 ```bash
 systemctl enable nginx
 ```
+
 ### WSL 80 端口启动
 
 使用 setcap 命令让指定程序拥有绑定端口的能力，这样即使程序运行在普通用户下，也能够绑定到 1024 以下的特权端口上。
@@ -562,4 +563,60 @@ sudo setcap cap_net_bind_service=+eip /home/crazy/nginx/sbin/nginx
 
 ```bash
 sudo setcap -r /home/crazy/nginx/sbin/nginx
+```
+
+### 调试前赋予 gdb 高级权限
+
+```bash
+sudo setcap cap_sys_ptrace=eip /usr/bin/gdb
+```
+
+```json
+        {
+            "name": "master_debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/home/crazy/nginx/sbin/nginx",
+            "args": [
+                "-c",
+                "/home/crazy/ngx_modules/nginx.conf",
+                "-p",
+                "/home/crazy/nginx",
+                "-g",
+                "daemon off;"
+            ],
+            "stopAtEntry": false,
+            "cwd": "/home/crazy/nginx",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "为 gdb 启用整齐打印",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "将反汇编风格设置为 Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "worker_debug",
+            "type": "cppdbg",
+            "request": "attach",
+            "program": "/home/crazy/nginx/sbin/nginx",
+            "processId": "${input:processId}",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
 ```
