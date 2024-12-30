@@ -1,7 +1,8 @@
 import { defineConfig, type DefaultTheme } from "vitepress";
 import { withMermaid } from "vitepress-plugin-mermaid";
 import GenerateSideBar from "./AutoSideBar";
-export default withMermaid(
+export default 
+// withMermaid(
   defineConfig({
     head: [["link", { rel: "icon", href: "/DocsLearn/favicon.ico" }]],
     lang: "zh-Hans",
@@ -62,7 +63,9 @@ export default withMermaid(
       lightModeSwitchTitle: "切换到浅色模式",
       darkModeSwitchTitle: "切换到深色模式",
     }
-  }));
+  })
+// )
+;
 
 function nav(): DefaultTheme.NavItem[] {
   return [
