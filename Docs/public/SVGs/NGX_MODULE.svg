@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="720">
+
+    <rect width="100%" height="100%" fill="white" />
+
+    <text x="7%" y="10%" font-size="30">
+        模块分类
+    </text>
+    <g fill="none" stroke-width="1">
+        <rect x="100" y="100" width="280" height="100" stroke="#6673e7" class="conf" />
+        <rect x="100" y="210" width="280" height="200" stroke="#e96c9c" class="events" />
+        <rect x="390" y="100" width="280" height="310" stroke="#8ae766" class="http_moduel" />
+        <rect x="680" y="100" width="280" height="100" stroke="#6673e7" class="mail" />
+        <rect x="680" y="210" width="280" height="200" stroke="#9893F3" class="stream" />
+        <rect x="100" y="450" width="860" height="20%" stroke="#ffbf00" class="core" />
+    </g> 
+
+    <rect x="135" y="108" rx="8" width="200" height="29" fill="#ffbf00" stroke="black" />
+    <text x="155" y="130" font-size="20" > ngx_conf_module </text>
+    <text x="120" y="170" font-size="22" font-weight="700"> NGX_CONF_MODULE </text> 
+
+    <rect x="190" y="235" rx="8" width="100" height="29" fill="#e96c9c" stroke="black" />
+    <text x="210" y="257" font-size="20" > epoll </text> 
+    <rect x="169" y="283" rx="8" width="150" height="29" fill="#e96c9c" stroke="black" />
+    <text x="189" y="305" font-size="20" > event_core </text>
+    <text x="120" y="345" font-size="22" font-weight="700"> NGX_EVENT_MODULE </text> 
+
+    <rect x="425" y="142" rx="8" width="210" height="29" fill="#8ae766" stroke="black" />
+    <text x="447" y="162" font-size="20" > upstream相关模块 </text> 
+    <rect x="460" y="188" rx="8" width="160" height="29" fill="#8ae766" stroke="black" />
+    <text x="480" y="212" font-size="20" > 相应过滤模块 </text>
+    <rect x="460" y="235" rx="8" width="160" height="29" fill="#8ae766" stroke="black" />
+    <text x="480" y="257" font-size="20" > 请求处理模块 </text> 
+    <rect x="405" y="283" rx="8" width="255" height="29" fill="#8ae766" stroke="black" />
+    <text x="425" y="305" font-size="20" > ngx_http_core_module </text>
+    <text x="411" y="345" font-size="22" font-weight="700"> NGX_EVENT_MODULE </text> 
+
+    <rect x="690" y="108" rx="8" width="255" height="29" fill="#6673e7" stroke="black" />
+    <text x="710" y="130" font-size="20" > ngx_mail_core_module </text>
+    <text x="700" y="170" font-size="22" font-weight="700"> NGX_MAIL_MODULE </text> 
+
+    <rect x="750" y="235" rx="8" width="135" height="29" fill="#9893F3" stroke="black" />
+    <text x="770" y="257" font-size="20" > steam模块 </text> 
+    <rect x="686" y="283" rx="8" width="270" height="29" fill="#9893F3" stroke="black" />
+    <text x="706" y="305" font-size="20" > ngx_stream_core_module </text>
+    <text x="690" y="345" font-size="22" font-weight="700"> NGX_STREAM_MODULE </text>
+
+    <rect x="200" y="480" rx="8" width="110" height="29" fill="#ffbf00" stroke="black" />
+    <text x="220" y="502" font-size="20" > events </text>
+
+    <rect x="500" y="480" rx="8" width="80" height="29" fill="#ffbf00" stroke="black" />
+    <text x="520" y="502" font-size="20" > http </text>
+
+    <rect x="629" y="480" rx="8" width="80" height="29" fill="#ffbf00" stroke="black" />
+    <text x="649" y="502" font-size="20" > mail </text>
+    
+    <rect x="750" y="480" rx="8" width="110" height="29" fill="#ffbf00" stroke="black" />
+    <text x="770" y="502" font-size="20" > stream </text>
+    
+    <rect x="814" y="530" rx="8" width="110" height="29" fill="#ffbf00" stroke="black" />
+    <text x="834" y="552" font-size="20" > openssl </text>
+    
+  <rect fill="#ffbf00" height="29" id="svg_49" rx="8" stroke="black"  width="154" x="635.5" y="529.5"/>
+  <text font-size="20" id="svg_48"  x="652.29" y="551.5">thread_pool</text>
+  <rect fill="#ffbf00" height="29" id="svg_51" rx="8" stroke="black"  width="88" x="530.5" y="526.5"/>
+  <text font-size="20" id="svg_50" style="cursor: move;"  x="547.75" y="548.5">errlog</text>
+  <rect fill="#ffbf00" height="29" id="svg_53" rx="8" stroke="black"  width="74" x="395.5" y="527.5">core</rect>
+  <text font-size="20" id="svg_52" style="cursor: move;"  x="412.75" y="549.5">core</text>
+  <text font-size="22" font-weight="700" id="svg_54" style="cursor: move;"  x="121.46" y="561.5">NGX_CORE_MODULE</text>
+
+<defs>
+    <!-- 用作箭头的 marker -->
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="5"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" />
+    </marker>
+</defs>
+
+  <!-- 带标记的线 -->
+  <line
+    x1="10"
+    y1="10"
+    x2="90"
+    y2="90"
+    stroke="black"
+    marker-end="url(#arrow)" />
+
+
+</svg>
