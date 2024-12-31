@@ -7,6 +7,7 @@
   "scripts": {
     "docs:dev": "vitepress dev Docs",
     "docs:build": "vitepress build Docs",
-    "docs:preview": "vitepress preview Docs"
+    "docs:preview": "vitepress preview Docs",
+    "deploy": "rsync -avz --delete --chown root:root  /home/crazy/Documents/Knowledge/Docs/.vitepress/dist/ root@113.44.162.11:/usr/local/nginx/html"
   }
 }
