@@ -10,7 +10,7 @@
 # 自己创建的源码存放目录AppSource，方便管理
 cd ~/AppSource
 # 访问https://www.postgresql.org/ftp/source
-wgt https://ftp.postgresql.org/pub/source/v17.2/postgresql-17.2.tar.gz
+wget https://ftp.postgresql.org/pub/source/v17.2/postgresql-17.2.tar.gz
 tar -xvf postgresql-17.2.tar.gz
 ```
 
@@ -28,6 +28,11 @@ sudo apt install ...
 # 一般包含一下依赖，可根据需要进行选择,不同系统上的包名可能不同
 
 sudo apt install gcc perl-ExtUtils-Embed readline-devel zlib-devel openssl-devel pam pam-devel libxml2-devel libxslt-devel tcl tcl-devel python-devel docbook-style-dsssl flex bison openjade 
+
+# Debian 必须使用的依赖
+bison
+flex
+libreadline-dev
 
 ```
 
@@ -49,9 +54,6 @@ useradd pgadmin -d /home/pgadmin -g postgres
 # 设置密码
 passwd pgadmin
 
-# 切换到用户pgadmin
-
-su pgadmin
 ```
 
 
@@ -59,12 +61,19 @@ su pgadmin
 
 ```bash
 # 创建数据库目录和log目录
-mkdir /home/pgadmin/data /home/pgadmin/log
+mkdir /home/pgadmin /home/pgadmin/data /home/pgadmin/log
 
-cd /home/pgadmin/data
+# 修改用户目录权限
+sudo chown -R pgadmin:postgres /home/pgadmin
+
+# 切换到用户pgadmin
+su pgadmin
+
+# 切换至目录
+cd /usr/loacl/pgsql/bin
+
 # 初始化数据库
-initdb -D /home/pgadmin/data -U pgadmin
-
+./initdb -D /home/pgadmin/data -U pgadmin
 ```
 
 ### 远程访问
@@ -73,7 +82,8 @@ initdb -D /home/pgadmin/data -U pgadmin
 cd /home/pgadmin/data
 # 编辑pg_hba.conf文件
 vim pg_hba.conf
-# 找到host all all IP_ADDRESS# 找到host all all 127.0.0.1/32 md5 这一行，修改为host all all 0.0.0.0/0 md5
+# 找到host all all IP_ADDRESS# 找到host all all 127.0.0.1/32 md5 这一行，修改为
+host all all 0.0.0.0/0 md5
 
 # 编辑postgresql.conf文件
 vim postgresql.conf
@@ -100,5 +110,51 @@ create database dbname;
 #退出数据库
 ```
 
+# 配置postgresql服务
 
+## 编辑postgresql.service文件
 
+```bash {cmd=true}
+sudo vim /lib/systemd/system/postgresql.service
+```
+
+## 文件内容
+
+```bash 
+[Unit]
+Description=PostgreSQL database server
+After=network.target
+
+[Service]
+Type=forking
+User=pgadmin
+Group=postgres
+ExecStart=/usr/local/pgsql/bin/pg_ctl start -D /home/pgadmin/pgdata
+ExecStop=/usr/local/pgsql/bin/pg_ctl stop -D /home/pgadmin/pgdata
+ExecReload=/usr/local/pgsql/bin/pg_ctl reload -D /home/pgadmin/pgdata
+PIDFile=/home/pgadmin/pgdata/postmaster.pid
+
+[Install]
+WantedBy=multi-user.target
+```
+
+# 配置服务自动启动
+
+## 服务
+```bash {cmd=true}
+sudo systemctl start nginx
+sudo systemctl start postgresql
+```
+
+## 开机启动服务
+```bash {cmd=true}
+sudo systemctl enable nginx
+sudo systemctl enable postgresql
+```
+
+## 查看服务状态
+
+```bash {cmd=true}
+sudo systemctl status postgresql
+sudo systemctl status nginx
+```

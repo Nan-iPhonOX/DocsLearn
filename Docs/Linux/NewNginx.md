@@ -31,7 +31,7 @@ tar -xf nginx-1.26.2.tar.gz
 > SSL 协议也很重要
 
 ```bash
-sudo apt install gcc make libpcre3 libpcre3-dev openssl
+sudo apt install gcc make libpcre3 libpcre3-dev libssl-dev
 ```
 
 ### 编译前配置
@@ -507,18 +507,17 @@ WantedBy=multi-user.target
 
 [Unit]
 Description=nginx - high performance web server
-Documentation=https://nginx.org/en/docs/
 After=network.target
 
 [Service]
 Type=forking
 User=crazy
 Group=crazy
-ExecStartPre=/home/crazy/nginx/sbin/nginx -t -c /home/crazy/nginx/conf/nginx.conf
-ExecStart=/home/crazy/nginx/sbin/nginx -c /home/crazy/nginx/conf/nginx.conf
-ExecReload=/home/crazy/nginx/sbin/nginx -s reload
-ExecStop=/home/crazy/nginx/sbin/nginx -s stop
-PIDFile=/home/crazy/nginx/logs/nginx.pid
+ExecStartPre=/home/crazy/Application/nginx/sbin/nginx -t -c /home/crazy/Application/nginx/conf/nginx.conf
+ExecStart=/home/crazy/Application/nginx/sbin/nginx -c /home/crazy/Application/nginx/conf/nginx.conf
+ExecReload=/home/crazy/Application/nginx/sbin/nginx -s reload
+ExecStop=/home/crazy/Application/nginx/sbin/nginx -s stop
+PIDFile=/home/crazy/Application/nginx/logs/nginx.pid
 PrivateTmp=true
 
 [Install]
@@ -556,13 +555,13 @@ systemctl enable nginx
 
 ```bash
 # 在 Linux 系统下，只允许 Root 用户运行的程序才可以使用特权端口 ( 1024 以下的端口 )。
-sudo setcap cap_net_bind_service=+eip /home/crazy/nginx/sbin/nginx
+sudo setcap cap_net_bind_service=+eip /home/crazy/Application/nginx/sbin/nginx
 ```
 
 如果程序不再需要使用这个能力，你可以使用以下命令来清除。
 
 ```bash
-sudo setcap -r /home/crazy/nginx/sbin/nginx
+sudo setcap -r /home/crazy/Application/nginx/sbin/nginx
 ```
 
 ### 调试前赋予 gdb 高级权限
@@ -576,17 +575,17 @@ sudo setcap cap_sys_ptrace=eip /usr/bin/gdb
             "name": "master_debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/home/crazy/nginx/sbin/nginx",
+            "program": "/home/crazy/Application/nginx/sbin/nginx",
             "args": [
                 "-c",
                 "/home/crazy/ngx_modules/nginx.conf",
                 "-p",
-                "/home/crazy/nginx",
+                "/home/crazy/Application/nginx",
                 "-g",
                 "daemon off;"
             ],
             "stopAtEntry": false,
-            "cwd": "/home/crazy/nginx",
+            "cwd": "/home/crazy/Application/nginx",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -607,7 +606,7 @@ sudo setcap cap_sys_ptrace=eip /usr/bin/gdb
             "name": "worker_debug",
             "type": "cppdbg",
             "request": "attach",
-            "program": "/home/crazy/nginx/sbin/nginx",
+            "program": "/home/crazy/Application/nginx/sbin/nginx",
             "processId": "${input:processId}",
             "MIMode": "gdb",
             "miDebuggerPath": "/usr/bin/gdb",
@@ -620,3 +619,9 @@ sudo setcap cap_sys_ptrace=eip /usr/bin/gdb
             ]
         }
 ```
+### 将博客打包目录链接到html
+
+```bash
+ln -s ~/Documents/VitePress/Docs/.vitepress/dist html
+```
+

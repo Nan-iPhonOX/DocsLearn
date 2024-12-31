@@ -60,7 +60,7 @@ sudo vim /lib/systemd/system/postgresql.service
 
 ## 文件内容
 
-```bash {cmd=true}
+```bash 
 [Unit]
 Description=PostgreSQL database server
 After=network.target
