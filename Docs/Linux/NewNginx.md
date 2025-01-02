@@ -32,6 +32,22 @@ tar -xf nginx-1.26.2.tar.gz
 
 ```bash
 sudo apt install gcc make libpcre3 libpcre3-dev libssl-dev
+
+```
+### 当需要编译ngx_postgres模块时需手动配置config
+
+```ini
+ngx_addon_name=ngx_postgres
+
+HTTP_MODULES="$HTTP_MODULES ngx_postgres_module"
+# 添加include lib
+CORE_INCS="$CORE_INCS /usr/local/pgsql/include"
+CORE_LIBS="$CORE_LIBS /usr/local/pgsql/lib/libpq.so"
+
+NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/src/ngx_postgres_escape.c $ngx_addon_dir/src/ngx_postgres_handler.c $ngx_addon_dir/src/ngx_postgres_keepalive.c $ngx_addon_dir/src/ngx_postgres_module.c $ngx_addon_dir/src/ngx_postgres_output.c $ngx_addon_dir/src/ngx_postgres_processor.c $ngx_addon_dir/src/ngx_postgres_rewrite.c $ngx_addon_dir/src/ngx_postgres_upstream.c $ngx_addon_dir/src/ngx_postgres_util.c $ngx_addon_dir/src/ngx_postgres_variable.c"
+NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/src/ngx_postgres_escape.h $ngx_addon_dir/src/ngx_postgres_handler.h $ngx_addon_dir/src/ngx_postgres_keepalive.h $ngx_addon_dir/src/ngx_postgres_module.h $ngx_addon_dir/src/ngx_postgres_output.h $ngx_addon_dir/src/ngx_postgres_processor.h $ngx_addon_dir/src/ngx_postgres_rewrite.h $ngx_addon_dir/src/ngx_postgres_upstream.h $ngx_addon_dir/src/ngx_postgres_util.h $ngx_addon_dir/src/ngx_postgres_variable.h $ngx_addon_dir/src/ngx_postgres_ddebug.h $ngx_addon_dir/src/resty_dbd_stream.h"
+
+have=NGX_POSTGRES_MODULE . auto/have
 ```
 
 ### 编译前配置

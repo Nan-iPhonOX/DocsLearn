@@ -65,3 +65,69 @@ sudo apt install netselect-apt
 
 sudo netselect-apt -c CN bookworm && sudo mv sources.list /etc/apt/sources.list
 ```
+## 系统备份和还原
+
+### 安装btrfs
+
+```bash
+sudo apt-get update
+sudo apt-get install btrfs-progs
+```
+
+### 备份和还原脚本
+
+```bash
+#!/bin/bash
+
+# 默认不还原
+RESTORE=false
+
+# 检查是否提供了时间参数
+if [ "$1" ]; then
+    RESTORE=true
+    RESTORE_TIME="$1"
+fi
+
+# 备份源目录
+SOURCE_DIR="/"
+
+# VHDX 文件路径
+VHDX_FILE="/mnt/x/WSL/backup/backup.vhdx"
+
+# 挂载点
+MOUNT_POINT="/mnt/backup"
+
+# 检查 VHDX 文件是否存在
+if [ ! -f "$VHDX_FILE" ]; then
+    echo "VHDX 文件不存在: $VHDX_FILE"
+    echo "创建新的 VHDX 文件..."
+    dd if=/dev/zero of=$VHDX_FILE bs=1M count=10240
+    mkfs.btrfs $VHDX_FILE
+fi
+
+# 挂载 VHDX 文件
+mkdir -p $MOUNT_POINT
+mount -o loop $VHDX_FILE $MOUNT_POINT
+
+if [ "$RESTORE" = true ]; then
+    # 还原系统到指定时间
+    RESTORE_DIR="$MOUNT_POINT/$RESTORE_TIME"
+    if [ ! -d "$RESTORE_DIR" ]; then
+        echo "指定的还原时间目录不存在: $RESTORE_DIR"
+        umount $MOUNT_POINT
+        exit 1
+    fi
+    btrfs subvolume snapshot $RESTORE_DIR $SOURCE_DIR
+    echo "系统已还原到: $RESTORE_TIME"
+else
+    # 备份目标目录
+    DEST_DIR="$MOUNT_POINT/$(date +\%Y-\%m-\%d)"
+
+    # 创建快照
+    btrfs subvolume snapshot $SOURCE_DIR $DEST_DIR
+    echo "系统已备份到: $DEST_DIR"
+fi
+
+# 卸载 VHDX 文件
+umount $MOUNT_POINT
+```

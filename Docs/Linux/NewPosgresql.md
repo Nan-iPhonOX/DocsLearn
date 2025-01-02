@@ -76,6 +76,22 @@ cd /usr/loacl/pgsql/bin
 ./initdb -D /home/pgadmin/data -U pgadmin
 ```
 
+### 配置环境变量
+
+#### 将配置写入rc
+```bash
+.zshrc
+# postgresql 
+export PGHOME=/usr/local/pgsql
+export PGDATA=/home/pgadmin/data
+export PATH=$PATH:$PGHOME/bin
+# 设置动态库收索目录
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PGHOME/lib/
+```
+
+重启wsl
+
+
 ### 远程访问
 ```bash
 # 进入数据库目录
