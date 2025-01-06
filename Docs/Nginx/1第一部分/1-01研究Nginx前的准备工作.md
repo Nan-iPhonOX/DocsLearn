@@ -333,8 +333,8 @@ make install 命令根据 configure 执行时的参数将 Nginx 部署到指定�
 
    除了少量核心代码外，Nginx 完全是由各种功能模块组成的。这些模块会根据配置参数决定自己的行为，因此，正确地使用各个模块非常关键。在 configure 的参数中，我们把它们分为五大类。
 
-   ![modules](../public/SVGs/NGX_MODULE.svg)
-
+   ![modules](/SVGs/NGX_MODULE.svg)
+   
    - 事件模块。
 
    - 默认即编译进入 Nginx 的 HTTP 模块。

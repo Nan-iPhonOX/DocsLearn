@@ -1,72 +1,84 @@
 import { defineConfig, type DefaultTheme } from 'vitepress'
 import GenerateSideBar from "./Utils/AutoSideBar"
 export default defineConfig({
-    head: [["link", { rel: "icon", href: "/DocsLearn/favicon.ico" }]],
-    lang: "zh-Hans",
-    title: "图书馆",
-    base: "/DocsLearn/",
-    description: "由 Vite 和 Vue 驱动的静态站点生成器",
-    themeConfig: {
-      nav: nav(),
-      search: {
-        provider: "local",
+  head: [["link", { rel: "icon", href: "/DocsLearn/favicon.ico" }]],
+  lang: "zh-Hans",
+  title: "图书馆",
+  base: "/DocsLearn/",
+  description: "由 Vite 和 Vue 驱动的静态站点生成器",
+  themeConfig: {
+    nav: nav(),
+    search: {
+      provider: "local",
+    },
+    sidebar: {
+      Learn: GenerateSideBar(`Learn`),
+      Linux: GenerateSideBar(`Linux`),
+      Nginx: GenerateSideBar(`Nginx`),
+      PressGuide: { base: "/PressGuide/", items: sidebarGuide() },
+      "/PressReference/": {
+        base: "/PressReference/",
+        items: sidebarReference(),
       },
-      sidebar: {
-        Learn: GenerateSideBar(`Learn`),
-        Linux: GenerateSideBar(`Linux`),
-        Nginx: GenerateSideBar(`Nginx`),
-        PressGuide: { base: "/PressGuide/", items: sidebarGuide() },
-        "/PressReference/": {
-          base: "/PressReference/",
-          items: sidebarReference(),
-        },
-      },
+    },
 
-      editLink: {
-        pattern:
-          "https://github.com/Nan-iPhonOX/DocsLearn/edit/main/docs/:path",
-        text: "编辑此页面",
-      },
+    editLink: {
+      pattern:
+        "https://github.com/Nan-iPhonOX/DocsLearn/edit/main/docs/:path",
+      text: "编辑此页面",
+    },
 
-      footer: {
-        message: "For Miss Li.",
-        copyright: `教资2019-${new Date().getFullYear()}`,
-      },
+    footer: {
+      message: "For Miss Li.",
+      copyright: `教资2019-${new Date().getFullYear()}`,
+    },
 
-      docFooter: {
-        prev: "上一页",
-        next: "下一页",
-      },
+    docFooter: {
+      prev: "上一页",
+      next: "下一页",
+    },
 
-      outline: {
-        label: "目录",
-      },
+    outline: {
+      label: "目录",
+    },
 
-      lastUpdated: {
-        text: "最后更新于",
-        formatOptions: {
-          dateStyle: "short",
-          timeStyle: "medium",
-        },
+    lastUpdated: {
+      text: "最后更新于",
+      formatOptions: {
+        dateStyle: "short",
+        timeStyle: "medium",
       },
+    },
 
-      langMenuLabel: "多语言",
-      returnToTopLabel: "回到顶部",
-      sidebarMenuLabel: "菜单",
-      darkModeSwitchLabel: "主题",
-      lightModeSwitchTitle: "切换到浅色模式",
-      darkModeSwitchTitle: "切换到深色模式",
-    }
+    langMenuLabel: "多语言",
+    returnToTopLabel: "回到顶部",
+    sidebarMenuLabel: "菜单",
+    darkModeSwitchLabel: "主题",
+    lightModeSwitchTitle: "切换到浅色模式",
+    darkModeSwitchTitle: "切换到深色模式",
+  }
 })
 
 function nav(): DefaultTheme.NavItem[] {
   return [
     {
-      text: "Learn",
-      link: "/Learn/2024年05月",
+      text: "📘Learn",
+      link: "/Learn/2024年业务学习/2024年05月",
       activeMatch: "/Learn/",
+    },
+    {
+      text: "🐧Linux",
+      link: "/Linux/NewWsl"
+    },
+    {
+      text: "🆖Nginx",
+      link: "/Nginx/0-01前序"
+    },
+    {
+      text: `<img src="/DocsLearn/favicon.ico" alt="Logo" style="height: 20px; vertical-align: middle;">`,
+      link: "/Learn/2024年业务学习/2024年05月"
     }
-    ];
+  ];
 }
 
 function sidebarGuide(): DefaultTheme.SidebarItem[] {

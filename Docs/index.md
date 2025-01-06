@@ -6,15 +6,15 @@ titleTemplate: 努力学习
 
 hero:
   name: 图书馆
-  text: 一个给老婆学习提供效率的站点
+  text: 一个为学习提供效率的站点
   tagline: 让学习随时随地
   actions:
     - theme: brand
       text: 每日一学
-      link: /Learn/2024年05月
+      link: /Learn/2024年业务学习/2024年05月
     - theme: alt
       text: 复习周期
-      link: /Learn/2024年09月
+      link: /Learn/2024年业务学习/2024年09月
   image:
       src: /log-large.svg
       alt: 认真学习
