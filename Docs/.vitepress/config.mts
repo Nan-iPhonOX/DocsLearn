@@ -15,9 +15,6 @@ export default defineConfig({
         Learn: GenerateSideBar(`Learn`),
         Linux: GenerateSideBar(`Linux`),
         Nginx: GenerateSideBar(`Nginx`),
-        // XLLSDK: GenerateSideBar(`XLLSDK`),
-        // GitLearn: GenerateSideBar(`GitLearn`),
-        // CppPrimerV5: GenerateSideBar(`CppPrimerV5`),
         PressGuide: { base: "/PressGuide/", items: sidebarGuide() },
         "/PressReference/": {
           base: "/PressReference/",

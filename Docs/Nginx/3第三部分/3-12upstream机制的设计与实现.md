@@ -1,6 +1,10 @@
-## 第 12 章 upstream 机制的设计与实现
+---
+outline: [2, 3]
+---
 
-[第 5 章](./3.第二部分.md#第-5-章访问第三方服务)中曾经举例说明过 upstream 机制的一种基础用法，本章将讨论 upstream 机制的设计和实现，以此帮助读者全面了解如何使用 upstream 访问上游服务器。upstream 机制是事件驱动框架与 HTTP 框架的综合，它既属于 HTTP 框架的一部分，又可以处理所有基于 TCP 的应用层协议（不限于 HTTP）。它不仅没有任何阻塞地实现了 Nginx 与上游服务器的交互，同时又很好地解决了**一个请求、多个 TCP 连接、多个读/写事件间的复杂关系**。为了帮助 Nginx 实现反向代理功能，upstream 机制除了提供基本的与上游交互的功能之外，还实现了转发上游应用层协议的响应包体到下游客户端的功能（与下游之间当然还是使用 HTTP）。在这些过程中，upstream 机制使用内存时极其“节省”，特别是在转发响应包体时，它从不会把一份上游的协议包复制多份。考虑到上下游间网速的不对称，upstream 机制还提供了以大内存和磁盘文件来缓存上游响应的功能。
+# 第 12 章 upstream 机制的设计与实现
+
+[第 5 章]中曾经举例说明过 upstream 机制的一种基础用法，本章将讨论 upstream 机制的设计和实现，以此帮助读者全面了解如何使用 upstream 访问上游服务器。upstream 机制是事件驱动框架与 HTTP 框架的综合，它既属于 HTTP 框架的一部分，又可以处理所有基于 TCP 的应用层协议（不限于 HTTP）。它不仅没有任何阻塞地实现了 Nginx 与上游服务器的交互，同时又很好地解决了**一个请求、多个 TCP 连接、多个读/写事件间的复杂关系**。为了帮助 Nginx 实现反向代理功能，upstream 机制除了提供基本的与上游交互的功能之外，还实现了转发上游应用层协议的响应包体到下游客户端的功能（与下游之间当然还是使用 HTTP）。在这些过程中，upstream 机制使用内存时极其“节省”，特别是在转发响应包体时，它从不会把一份上游的协议包复制多份。考虑到上下游间网速的不对称，upstream 机制还提供了以大内存和磁盘文件来缓存上游响应的功能。
 
 因此，拥有高性能、高效率以及高度灵活性的 upstream 机制值得我们花费精力去了解它的设计、实现，这样才能更好地使用它。同时，通过学习它的设计思想，也可以深入了解配合应用层业务基于第 9 章的事件框架开发 Nginx 模块的方法。
 
@@ -8,11 +12,11 @@
 
 Nginx 访问上游服务器的流程大致可以分为以下 6 个阶段：启动 upstream 机制、连接上游服务器、向上游服务器发送请求、接收上游服务器的响应包头、处理接收到的响应包体、结束请求。本章首先在 12.1 节系统地讨论 upstream 机制的设计目的，以及为了实现这些目的需要用到的数据结构，之后会按照顺序介绍上述 6 个阶段。
 
-### 12.1 upstream 机制概述
+## 12.1 upstream 机制概述
 
 本节将说明 upstream 机制的设计目的，包括它能够解决哪几类问题。接下来就会介绍一个关键结构体 ngx_http_upstream_t 以及它的 conf 成员（ngx_http_upstream_conf_t 结构体），事实上这两个结构体中的各个成员意义有些混淆不清，有些仅用于 upstream 框架使用，有些却是希望使用 upstream 的 HTTP 模块来设置的，这也是 C 语言编程的弊端。因此，如果希望直接编写使用 upstream 机制的复杂模块，可以采取顺序阅读的方式；如果希望更多地了解 upstream 的工作流程，则不妨先跳过对这两个结构体的详细说明，继续向下了解 upstream 流程，在流程的每个阶段中都会使用到这两个结构体中的成员，到时可以再返回查询每个成员的意义，这样会更有效率。
 
-#### 12.1.1 设计目的
+### 12.1.1 设计目的
 
 那么，到底什么是 upstream 机制？它的设计目的有哪些？先来看看图 12-1。
 
@@ -42,13 +46,13 @@ Nginx 不仅仅可以用做 Web 服务器。upstream 机制其实是由 ngx_http
 
 2）上、下游的网速可能差别非常大，通常在产品环境中，Nginx 与上游服务器之间是内网，网速会很快，而 Nginx 与下游的客户端之间则是公网，网速可能非常慢。对于这种情况，将会有以下两种解决方案：
 
-- 当上、下游网速差距不大，或者下游速度更快时，出于能够并发更多请求的考虑，必然希望**内存可以使用得少一些**，这时将会开辟一块固定大小的内存（由 ngx_http_upstream_conf_t 中的 buffer_size 指定大小），既用它来接收上游的响应，也用它来把保存的响应内容转发给下游。这样做也是有缺点的，当下游速度过慢而导致这块充当缓冲区的内存写满时，将无法再接收上游的响应，必须等待缓冲区中的内容全部发送给下游后才能继续接收。
+-   当上、下游网速差距不大，或者下游速度更快时，出于能够并发更多请求的考虑，必然希望**内存可以使用得少一些**，这时将会开辟一块固定大小的内存（由 ngx_http_upstream_conf_t 中的 buffer_size 指定大小），既用它来接收上游的响应，也用它来把保存的响应内容转发给下游。这样做也是有缺点的，当下游速度过慢而导致这块充当缓冲区的内存写满时，将无法再接收上游的响应，必须等待缓冲区中的内容全部发送给下游后才能继续接收。
 
 -   当上游网速远快于下游网速时，就必须要开辟足够的内存缓冲区来缓存上游响应（ngx_http_upstream_conf_t 中的 bufs 指定了每块内存缓冲区的大小，以及最多可以有多少块内存缓冲区），当达到内存使用上限时还会把上游响应缓存到磁盘文件中（当然，磁盘文件也是有大小限制的，ngx_http_upstream_conf_t 中的 max_temp_file_size 指定了临时缓存文件的最大长度），虽然内存和磁盘的缓冲都满后，仍然会发生暂时无法接收上游响应的场景，但这种概率就小得多了，特别是临时文件的上限设置得较大时。
 
 转发响应时一个比较难以解决的问题是 Nginx 对内存使用得太“节省”，即从来不会把接收到的上游响应缓冲区复制为两份。这就带来了一个问题，当同一块缓冲区既用于接收上游响应，又用于向下游发送响应，同时可能还在写入临时文件，那么，这块缓冲区何时可以释放，以便接收新的缓冲区呢？对于这个问题，Nginx 是采用多个 ngx_buf_t 结构体指向同一块内存的做法来解决的，并且这些 ngx_buf_t 缓冲区的 shadow 域会互相引用，以确保真实的缓冲区真的不再使用时才会回收、复用。
 
-#### 12.1.2 ngx_http_upstream_t 数据结构的意义
+### 12.1.2 ngx_http_upstream_t 数据结构的意义
 
 使用 upstream 机制时必须构造 ngx_http_upstream_t 结构体，下面详述其中每个成员的意义。
 
@@ -162,7 +166,7 @@ struct ngx_http_upstream_s {
 
 到目前为止，ngx_http_upstream_t 结构体中有些成员仍然没有使用到，还有更多的成员其实仅是 HTTP 框架自己使用，HTTP 模块在使用 upstream 时需要设置的成员并不是太多，但在实现 process_header、input_filter 等回调方法时，还是需要对各个成员有一个初步的了解，这样才能高效地使用 upstream 机制。
 
-#### 12.1.3 ngx_http_upstream_conf_t 配置结构体
+### 12.1.3 ngx_http_upstream_conf_t 配置结构体
 
 ngx_http_upstream_t 结构体中的 conf 成员是非常关键的，它指定了 upstream 的运行方式。注意，它必须在启动 upstream 机制前设置。下面来看看这个结构体中各个成员的意义。
 
@@ -274,7 +278,7 @@ unsigned change_buffering:1;
 
 ngx_http_upstream_conf_t 结构体中的配置都比较重要，它们会影响访问上游服务器的方式。同时，该结构体中的大量成员是与如何转发上游响应相关的。如果用户希望直接转发上游的包体到下游，那就需要注意 ngx_http_upstream_conf_t 中每一个成员的意义了。
 
-### 12.2 启动 upstream
+## 12.2 启动 upstream
 
 在把请求里 ngx_http_request_t 结构体中的 upstream 成员（ngx_http_upstream_t 类型）创建并设置好，并且正确设置 upstream-\>conf 配置结构体（ngx_http_upstream_conf_t 类型）后，就可以启动 upstream 机制了。启动方式非常简单，调用 ngx_http_upstream_init 方法即可。
 
@@ -315,7 +319,7 @@ r->write_event_handler = ngx_http_upstream_wr_check_broken_connection;
 
 注意启动 upstream 机制时还有许多分支流程，如缓存文件的使用、上游服务器地址的选取等，图 12-2 概括了最主要的 5 个步骤，这样方便读者了解 upstream 的核心思想。其他分支的处理不影响这 5 个主要流程，如需了解可自行查看 ngx_http_upstream_init 和 ngx_http_upstream_init_request 方法的源代码。
 
-### 12.3 与上游服务器建立连接
+## 12.3 与上游服务器建立连接
 
 upstream 机制与上游服务器是通过 TCP 建立连接的，众所周知，建立 TCP 连接需要三次握手，而三次握手消耗的时间是不可控的。为了保证建立 TCP 连接这个操作不会阻塞进程，Nginx 使用无阻塞的套接字来连接上游服务器。图 12-2 的第 5 步调用的 ngx_http_upstream_connect 方法就是用来连接上游服务器的，由于使用了非阻塞的套接字，当方法返回时与上游之间的 TCP 连接未必会成功建立，可能还需要等待上游服务器返回 TCP 的 SYN/ACK 包。因此，ngx_http_upstream_connect 方法主要负责发起建立连接这个动作，如果这个方法没有立刻返回成功，那么需要在 epoll 中监控这个套接字，当它出现可写事件时，就说明连接已经建立成功了。
 
@@ -374,7 +378,7 @@ ngx_http_run_posted_requests(c);
 }
 ```
 
-### 12.4 发送请求到上游服务器
+## 12.4 发送请求到上游服务器
 
 向上游服务器发送请求是一个阶段，因为请求的大小是未知的，所以发送请求的方法需要被 epoll 调度许多次后才可能发送完请求的全部内容。在图 12-3 中的第 6 步将 ngx_http_upstream_t 里的 write_event_handler 成员设为 ngx_http_upstream_send_request_handler 方法，也就是说，由该方法负责反复地发送请求，可是，在图 12-3 的第 9 步又直接调用了 ngx_http_upstream_send_request 方法发送请求，那这两种方法之间有什么关系吗？先来看看前者的实现，它相对简单，这里直接列举了它的主要源代码，如下所示。
 
@@ -451,11 +455,11 @@ rc = ngx_output_chain(&u->output, NULL);
 
 在发送请求到上游服务器的这个阶段中，每当 TCP 连接上再次可以发送字符流时，虽然事件框架就会回调 ngx_http_upstream_send_request_handler 方法处理可写事件，但最终还是通过调用 ngx_http_upstream_send_request 方法把请求发送出去的。
 
-### 12.5 接收上游服务器的响应头部
+## 12.5 接收上游服务器的响应头部
 
 当请求全部发送给上游服务器时，Nginx 开始准备接收来自上游服务器的响应。在图 12-3 的第 7 步中设置了由 ngx_http_upstream_process_header 方法处理上游服务器的响应，而图 12-4 的第 8 步也是通过调用该方法接收响应的，本节的内容就在于说明可能会被反复多次调用的 ngx_http_upstream_process_header 方法。
 
-### 12.5.1 应用层协议的两段划分方式
+## 12.5.1 应用层协议的两段划分方式
 
 在 12.1.1 节我们已经了解到，只要上游服务器提供的应用层协议是基于 TCP 实现的，那么 upstream 机制都是适用的。基于 TCP 的响应其实就是有顺序的数据流，那么，upstream 机制只需要按照接收到的顺序调用 HTTP 模块来解析数据流不就行了吗？多么简单和清晰！然而，实际上，应用层协议要比这复杂得多，这主要表现在协议长度的不可确定和协议内容的解析上。首先，应用层协议的响应包可大可小，如最小的响应可能只有 128B，最大的响应可能达到 5GB，如果属于 HTTP 框架的 ngx_http_upstream_module 模块在内存中接收到全部响应内容后再调用各个 HTTP 模块处理响应，就很容易引发 OutOfMemory 错误，即使没有错误也会因为内存消耗过大从而降低了并发处理能力。如果在磁盘文件中接收全部响应，又会带来大量的磁盘 I/O 操作，最终大幅提高服务器的负载。其次，对响应中的所有内容都进行解析并无必要（解析操作毕竟对 CPU 是有消耗的）。例如，从 Memcached 服务器上下载一幅图片，Nginx 只需要解析 Memcached 协议，并不需要解析图片的内容，对于图片内容，Nginx 只需要边接收边转发给客户端即可。
 
@@ -466,7 +470,7 @@ rc = ngx_output_chain(&u->output, NULL);
 
 包体的内容往往较为简单，当 HTTP 模块希望实现反向代理功能时大都不希望解析包体。这样的话，upstream 机制基于这种最常见的需求，把包体的常见处理方式抽象出 3 类加以实现，12.5.2 节中将介绍这 3 种包体的处理方式。
 
-### 12.5.2 处理包体的 3 种方式
+## 12.5.2 处理包体的 3 种方式
 
 为什么 upstream 机制不是仅仅负责接收上游服务器发来的包体，再交由 HTTP 模块决定如何处理这个包体呢？这是因为 upstream 有一个最重要的使命要完成！Nginx 作为一个试图取代 Apache 的 Web 服务器，最基本的反向代理功能是必须存在的，而实现反向代理的 Web 服务器并不仅仅希望可以访问上游服务器，它更希望 upstream 能够实现透传、转发上游响应的功能。
 
@@ -490,7 +494,7 @@ upstream 机制不关心如何构造发送到上游的请求内容，这事实�
 
 在转发响应时，如果上游网速快于下游网速（由于 Nginx 支持高并发特性，所以大多数时候都用于做最前端的 Web 服务器，这时上游网速都会快于下游网速），这时需要开辟内存或者磁盘文件缓存来自上游服务器的响应，注意，缓存可能会非常大。这种处理方式比较复杂，在 12.8 节中我们会详细描述其主要流程。
 
-### 12.5.3 接收响应头部的流程
+## 12.5.3 接收响应头部的流程
 
 下面开始介绍读取上游服务器响应的 ngx_http_upstream_process_header 方法，这个方法主要用于接收、解析响应头部，当然，由于 upstream 机制是不涉及应用层协议的，谁使用了 upstream 谁就要负责解析应用层协议，所以必须由 HTTP 模块实现的 process_header 方法解析响应包头。当包头接收、解析完毕后，ngx_http_upstream_process_header 方法还会决定以哪种方式处理包体（参见 12.5.2 节中介绍的 3 种包体处理方式）。
 
@@ -536,7 +540,7 @@ ngx_http_upstream_process_header 方法执行完毕。
 
 从上面的第 9 步可以看出，当需要转发包体时将调用 ngx_http_upstream_send_response 方法来转发包体。ngx_http_upstream_send_response 方法将会根据 ngx_http_upstream_conf_t 配置结构体中的 buffering 标志位来决定是否打开缓存来处理响应，也就是说，buffering 为 0 时通常会默认下游网速更快，这时不需要缓存响应（在 12.7 节中将会介绍这一流程）。如果 buffering 为 1，则表示上游网速更快，这时需要用大量内存、磁盘文件来缓存来自上游的响应（在 12.8 节中会介绍这一流程）。
 
-### 12.6 不转发响应时的处理流程
+## 12.6 不转发响应时的处理流程
 
 实际上，这里的不转发响应只是不使用 upstream 机制的转发响应功能而已，但如果 HTTP
 模块有意愿转发响应到下游，还是可以通过 input_filter 方法实现相关功能的。
@@ -549,7 +553,7 @@ HTTP 模块可以自由地选择使用哪种方式。
 
 ngx_http_upstream_process_body_in_memory 就是在 upstream 机制不转发响应时，作为读事件的回调方法在内存中处理上游服务器响应包体的。每次与上游的 TCP 连接上有读事件触发时，它都会被调用，HTTP 模块通过重新实现 input_filter 方法来处理包体，在 12.6.1 节中会讨论如何实现这个回调方法；如果 HTTP 模块不实现 input_filter 方法，那么 upstream 机制就会自动使用默认的 ngx_http_upstream_non_buffered_filter 方法来处理包体，在 12.6.2 节中会讨论这个默认的 input_filter 方法做了些什么；在 12.6.3 节中将会具体分析 ngx_http_upstream_process_body_in_memory 方法的工作流程。
 
-### 12.6.1 input_filter 方法的设计
+## 12.6.1 input_filter 方法的设计
 
 先来看一下 input_filter 回调方法的定义，如下所示。
 
@@ -581,7 +585,7 @@ data 参数意义同上，仍然是 input_filter_ctx 成员。
 
 input_filter 的返回值非常简单，只要不是返回 NGX_ERROR，就都认为是成功的，当然，不出错时最好还是返回 NGX_OK。如果返回 NGX_ERROR，则请求会结束，参见图 12-6。
 
-### 12.6.2 默认的 input_filter 方法
+## 12.6.2 默认的 input_filter 方法
 
 如果 HTTP 模块没有实现 input_filter 方法，那么将使用 ngx_http_upstream_non_buffered_filter 方法作为 input_filter，这个默认的方法将会试图在 buffer 缓冲区中存放全部的响应包体。
 
@@ -638,7 +642,7 @@ return NGX_OK;
 
 注意对于上述这段代码的理解，可参见图 12-8 第 4 步中 ngx_chain_update_chains 方法的执行过程，它们是配对执行的。
 
-### 12.6.3 接收包体的流程
+## 12.6.3 接收包体的流程
 
 本节介绍的实际就是 ngx_http_upstream_process_body_in_memory 方法的执行流程，它会负责接收上游服务器的包体，同时调用 HTTP 模块实现的 input_filter 方法处理包体，如图 12-6 所示。
 
@@ -662,7 +666,7 @@ return NGX_OK;
 
 图 12-6 ngx_http_upstream_process_body_in_memory 方法的流程图
 
-### 12.7 以下游网速优先来转发响应
+## 12.7 以下游网速优先来转发响应
 
 转发上游服务器的响应到下游客户端，这项工作必然是由上游事件来驱动的。因此，以下游网速优先实际上只是意味着需要开辟一块固定长度的内存作为缓冲区。在图 12-5 的第 9 步中会调用 ngx_http_upstream_send_response 方法向客户端转发响应，在该方法中将会判断 buffering 标志位，如果 buffering 为 1，则表明需要打开缓冲区，这时将会优先考虑上游网速，尽可能多地接收上游服务器的响应到内存或者磁盘文件中；而如果 buffering 为 0，则只开辟固定大小的缓冲区内存，在接收上游服务器的响应时如果缓冲区已满则暂停接收，等待缓冲区中的响应发送给客户端后缓冲区会自然清空，于是就可以继续接收上游服务器的响应了。这种设计的好处是没有使用大量内存，这对提高并发连接是有好处的，同时也没有使用磁盘文件，这对降低服务器负载、某些情况下提高请求处理能力也是有益的。
 
@@ -672,7 +676,7 @@ return NGX_OK;
 
 当 X-Accel-Buffering 头部值为 yes 时，对于本次请求而言，buffering 相当于重设为 1，如果头部值为 no，则相当于 buffering 改为 0，除此以外的头部值将不产生作用（参见 ngx_http_upstream_process_buffering 方法）。因此，转发响应时究竟是否需要打开缓存，可以在运行时根据请求的不同而灵活变换。
 
-### 12.7.1 转发响应的包头
+## 12.7.1 转发响应的包头
 
 转发响应包头这一动作是在 ngx_http_upstream_send_response 方法中完成的，无论 buffering 标志位是否为 0，都会使用该方法来发送响应的包头，图 12-7 和图 12-9 共同构成了 ngx_http_upstream_send_response 方法的完整流程。先来看一下图 12-7，它描述了单一缓冲区下是如何转发包头到客户端，以及为转发包体做准备的。
 
@@ -723,7 +727,7 @@ NGX_HTTP_FLUSH 标志位意味着如果请求 r 的 out 缓冲区中依然有等
 
 以上步骤提到的下游处理方法 ngx_http_upstream_process_non_buffered_downstream 和上游处理方法 ngx_http_upstream_process_non_buffered_upstream 都将在下文中介绍。
 
-### 12.7.2 转发响应的包体
+## 12.7.2 转发响应的包体
 
 当接收到上游服务器的响应时，将会由 ngx_http_upstream_process_non_buffered_upstream 方法处理连接上的这个读事件，该方法比较简单，下面直接列举源代码说明其流程。
 
@@ -837,7 +841,7 @@ size = u->buffer.end - u->buffer.last;
 
 阅读完第 11 章，读者应该很熟悉 Nginx 读/写事件的处理过程了。另外，理解转发包体这一过程最关键的是弄清楚缓冲区的用法，特别是分配了实际内存的 buffer 缓冲区与仅仅负责指向 buffer 缓冲区内容的 3 个链表（out_bufs、busy_bufs、free_bufs）之间的关系，这样就对这种转发过程的优缺点非常清楚了。如果下游网速慢，那么有限的 buffer 缓冲区就会降低上游的发送响应速度，可能对上游服务器带来高并发压力。
 
-### 12.8 以上游网速优先来转发响应
+## 12.8 以上游网速优先来转发响应
 
 如果上游服务器向 Nginx 发送响应的速度远快于下游客户端接收 Nginx 转发响应时的速度，这时可以通过将 ngx_http_upstream_conf_t 配置结构体中的 buffering 标志位设为 1，允许 upstream 机制打开更大的缓冲区来缓存那些来不及向下游转发的响应，允许当达到内存构成的缓冲区上限时以磁盘文件的形式来缓存来不及向下游转发的响应。什么是更大的缓冲区呢？由 12.7 节我们知道，当 buffering 标志位为 0 时，将使用 ngx_http_upstream_conf_t 配置结构体 中的 buffer_size 指定的一块固定大小的缓冲区来转发响应，而当 buffering 为 1 时，则使用 bufs 成员指定的内存缓冲区（最多拥有 bufs.num 个，每个缓冲区大小固定为 bufs.size 字节）来转发响应，当上游响应占满所有缓冲区时，使用最大不超过 max_temp_file_size 字节的临时文件来缓存响应。
 
@@ -845,7 +849,7 @@ size = u->buffer.end - u->buffer.last;
 
 这种转发响应方式集成了 Nginx 的文件缓存功能，本节将只讨论纯粹转发响应的流程，不会涉及文件缓存部分（以临时文件缓存响应并不属于文件缓存，因为临时文件在请求结束后会被删除）。
 
-### 12.8.1 ngx_event_pipe_t 结构体的意义
+## 12.8.1 ngx_event_pipe_t 结构体的意义
 
 如果将 ngx_http_upstream_conf_t 配置结构体的 buffering 标志位设置为 1，那么 ngx_event_pipe_t 结构体必须要由 HTTP 模块创建。
 
@@ -956,7 +960,7 @@ int num;
 
 注意，ngx_event_pipe_t 结构体仅用于转发响应。
 
-### 12.8.2 转发响应的包头
+## 12.8.2 转发响应的包头
 
 开始转发响应也是通过 ngx_http_upstream_send_response 方法执行的。图 12-9 展示了转发响应包头和初始化 ngx_event_pipe_t 结构体的流程。
 
@@ -1021,7 +1025,7 @@ p->preread_size = u->buffer.last - u->buffer.pos;
 
 ngx_event_pipe_t 结构体是打开缓存转发响应的关键，下面的章节中我们会一直与它“打交道”。
 
-### 12.8.3 转发响应的包体
+## 12.8.3 转发响应的包体
 
 在图 12-9 中我们看到，处理上游读事件的方法是 ngx_http_upstream_process_upstream，处理下游写事件的方法是 ngx_http_upstream_process_downstream，但它们最终都是通过 ngx_event_pipe 方法实现缓存转发响应功能的（类似于在 12.7.2 节中介绍过的无缓存转发响应情形，ngx_http_upstream_process_non_buffered_upstream 方法负责处理上游读事件，ngx_http_upstream_process_non_buffered_downstream 方法负责处理下游写事件，但它们最终都是通过 ngx_http_upstream_process_non_buffered_request 方法实现转发响应功能的）。无论是否打开缓存，它们的代码都非常相似，所以本节不再罗列这两种方法的代码，直接开始介绍 ngx_event_pipe 方法，先来看看它的定义。
 
@@ -1057,7 +1061,7 @@ ngx_int_t ngx_event_pipe(ngx_event_pipe_t *p, ngx_int_t do_write)
 
 可以看到，ngx_event_pipe 方法在没有涉及缓存细节的情况下设计了转发响应的流程，它是通过调用 ngx_event_pipe_read_upstream 方法和 ngx_event_pipe_write_to_downstream 方法，以及检测它们的返回值来把握缓存响应的转发，再把事件与 epoll 和定时器关联起来的。下面我们将详细描述如何读取响应、如何分配内存缓冲区、如何通过写入临时文件释放缓冲区、如何通过向下游发送响应来更新缓冲区。
 
-### 12.8.4 ngx_event_pipe_read_upstream 方法
+## 12.8.4 ngx_event_pipe_read_upstream 方法
 
 ngx_event_pipe_read_upstream 方法负责接收上游的响应，在这个过程中会涉及以下 4 种情况。
 
@@ -1134,7 +1138,7 @@ break;
 
 可以看到，ngx_event_pipe_read_upstream 方法将会把接收到的响应存放到内存或者磁盘文件中，同时用 ngx_buf_t 缓冲区指向这些响应，最后用 in 和 out 缓冲区链表把这些 ngx_buf_t 缓冲区管理起来。图 12-12 只是展示了 ngx_event_pipe_read_upstream 方法的主要流程，如果需要理解这种转发时缓冲区的详细用法，还需要对照着图 12-11 和图 12-12 来阅读 ngx_event_pipe.c 源文件。
 
-### 12.8.5 ngx_event_pipe_write_to_downstream 方法
+## 12.8.5 ngx_event_pipe_write_to_downstream 方法
 
 ngx_event_pipe_write_to_downstream 方法负责把 in 链表和 out 链表中管理的缓冲区发送给下游客户端，因为 out 链表中的缓冲区内容在响应中的位置要比 in 链表更靠前，所以 out 需要优先发送给下游。图 12-13 给出了 ngx_event_pipe_write_to_downstream 方法的流程图，这个流程图的核心就是在与下游的连接事件上出于可写状态时，尽可能地循环发送 out 和 in 链表缓冲区中的内容，其中在第 7、第 8 步中还会涉及 shadow 域中指向的缓冲区释放的问题。
 
@@ -1170,7 +1174,7 @@ ngx_event_pipe_write_to_downstream 方法负责把 in 链表和 out 链表中管
 
 至此，buffering 配置为 1 时转发上游响应到下游的整个流程就全部介绍完了，它的流程复杂，但效率很高，作为反向代理使用非常有优势。
 
-### 12.9 结束 upstream 请求
+## 12.9 结束 upstream 请求
 
 当 Nginx 与上游服务器的交互出错，或者正常处理完来自上游的响应时，就需要结束请求了。这时当然不能调用第 11 章中介绍的 ngx_http_finalize_request 方法来结束请求，这样 upstream 中使用到的资源（如与上游间建立的 TCP 连接）将无法释放，事实上，upstream 机制提供了一个类似的方法 ngx_http_upstream_finalize_request 用于结束 upstream 请求，在 12.9.1 节中将会详细介绍这个方法。除了直接调用 ngx_http_upstream_finalize_request 方法结束请求以外，还有两种独特的结束请求方法，分别是 ngx_http_upstream_cleanup 方法和 ngx_http_upstream_next 方法。
 
@@ -1258,7 +1262,7 @@ ngx_http_finalize_request(r, rc);
 }
 ```
 
-### 12.10 小结
+## 12.10 小结
 
 本章介绍的 upstream 机制也属于 HTTP 框架的一部分，它同样是基于事件框架实现了异步访问上游服务器的功能，同时，它并不满足于仅仅帮助应用级别的 HTTP 模块基于 TCP 访问上游，而是提供了非常强大的转发上游响应功能，而且在转发方式上更加灵活、高效，并且对于内存的使用相当节省，这些功能帮助 Nginx 的 ngx_http_proxy_module 模块实现了强大的反向代理功能。同时，配合着 ngx_http_upstream_ip_hash_module 或者 Round Robin 相关的代码（它们负责管理 ngx_peer_connection_t 上游连接），ngx_http_upstream_next 方法还可以帮助 HTTP 模块实现简单的负载均衡功能。
 

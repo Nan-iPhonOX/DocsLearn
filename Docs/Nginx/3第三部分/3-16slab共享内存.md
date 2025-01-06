@@ -1,4 +1,8 @@
-## 第 16 章 slab 共享内存
+---
+outline: [2, 3]
+---
+
+# 第 16 章 slab 共享内存
 
 许多场景下，不同的 Nginx 请求间必须交互后才能执行下去，例如限制一个客户端能够
 并发访问的请求数。可是 Nginx 被设计为一个多进程的程序，服务更健壮的另一面就是，
@@ -369,7 +373,7 @@ ngx_http_testslab_expire 方法则负责从双向链表的尾部开始检查访�
 的时间距当前已经超出了允许阀值，则可以删除访问记录从而释放共享内存。代码如下：
 static void
 ngx_http_testslab_expire(ngx_http_request_t *r,ngx*http_testslab_conf_t *conf) {
-ngx_time_t *tp;
+ngx_time_t _tp;
 ngx_msec_t now;
 ngx_queue_t \_q;
 ngx_msec_int_t ms;
@@ -377,7 +381,7 @@ ngx_rbtree_node_t \_node;
 ngx_http_testslab_node_t \_lr;
 // 取出缓存的当前时间
 tp = ngx_timeofday();
-now = (ngx_msec_t) (tp-\>sec * 1000 + tp-\>msec); // 循环的结束条件为，要么链表空了，要么遇到了一个不需要淘汰的结点
+now = (ngx_msec_t) (tp-\>sec _ 1000 + tp-\>msec); // 循环的结束条件为，要么链表空了，要么遇到了一个不需要淘汰的结点
 while (1) {
 // 要先判断链表是否为空
 if (ngx*queue_empty(&conf-\>sh-\>queue)) {
@@ -466,7 +470,7 @@ return NGX_CONF_OK;
 责，它会设置到 ngx_http_module_t 中。其代码如下：
 static void *
 ngx*http_testslab_create_main_conf(ngx_conf_t *cf) {
-ngx_http_testslab_conf_t *conf;
+ngx*http_testslab_conf_t *conf;
 // 在
 worker 内存中分配配置结构体
 conf = ngx_pcalloc(cf-\>pool, sizeof(ngx_http_testslab_conf_t)); if (conf == NULL) {
@@ -532,7 +536,7 @@ NULL, /* preconfiguration */
 ngx*http_testslab_init, /* postconfiguration */
 ngx*http_testslab_create_main_conf, /* create main configuration */
 NULL, /* init main configuration */
-NULL, /* create server configuration _/
+NULL, /* create server configuration */
 NULL, /_ merge server configuration _/
 NULL, /_ create location configuration _/
 NULL /_ merge location configuration _/
@@ -543,7 +547,7 @@ static ngx_int_t
 ngx_http_testslab_init(ngx_conf_t *cf)
 {
 ngx*http_handler_pt *h;
-ngx_http_core_main_conf_t *cmcf;
+ngx*http_core_main_conf_t *cmcf;
 cmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_core_module); // 设置模块在
 NGX_HTTP_PREACCESS_PHASE 阶段介入请求的处理
 h = ngx_array_push(&cmcf-\>phases[NGX_HTTP_PREACCESS_PHASE].handlers); if (h == NULL) {
@@ -590,14 +594,14 @@ ngx_module_t ngx_http_testslab_module =
 NGX_MODULE_V1,
 &ngx_http_testslab_module_ctx, /* module context */
 ngx*http_testslab_commands, /* module directives */
-NGX*HTTP_MODULE, /* module type _/
+NGX*HTTP_MODULE, /* module type */
 NULL, /_ init master _/
 NULL, /_ init module _/
 NULL, /_ init process _/
 NULL, /_ init thread _/
 NULL, /_ exit thread _/
 NULL, /_ exit process _/
-NULL, /_ exit master \*/
+NULL, /\_ exit master \*/
 NGX_MODULE_V1_PADDING
 };
 这样，一个支持多进程间共享数据、共同限制用户请求访问速度的模块就完成了。

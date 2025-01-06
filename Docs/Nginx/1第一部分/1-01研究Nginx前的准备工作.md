@@ -2,18 +2,13 @@
 outline: [2, 3]
 ---
 
-# 第一部分 Nginx 能帮我们做什么
-
-- [第 1 章 研究 Nginx 前的准备工作](#第一部分-nginx-能帮我们做什么)
-- [第 2 章 Nginx 的配置](./1-02Nginx的配置.md#第-2-章-nginx-的配置)
-
-## 第 1 章 研究 Nginx 前的准备工作
+# 第 1 章 研究 Nginx 前的准备工作
 
 2012 年，Nginx 荣获年度云计算开发奖（2012 Cloud Award for Developer of the Year），并成长为世界第二大 Web 服务器。全世界流量最高的前 1000 名网站中，超过 25% 都使用 Nginx 来处理海量的互联网请求。Nginx 已经成为业界高性能 Web 服务器的代名词。
 
 那么，什么是 Nginx？它有哪些特点？我们选择 Nginx 的理由是什么？如何编译安装 Nginx？这种安装方式背后隐藏的又是什么样的思想呢？本章将会回答上述问题。
 
-### 1.1 Nginx 是什么
+## 1.1 Nginx 是什么
 
 人们在了解新事物时，往往习惯通过类比来帮助自己理解事物的概貌。那么，我们在学习 Nginx 时也采用同样的方式，先来看看 Nginx 的竞争对手——Apache、Lighttpd、Tomcat、Jetty、IIS，它们都是 Web 服务器，或者叫做 WWW（World Wide Web）服务器，相应地也都具备 Web 服务器的基本功能：基于 REST 架构风格，以统一资源描述符（Uniform Resource Identifier，URI）或者统一资源定位符（Uniform Resource Locator，URL）作为沟通依据，通过 HTTP 为浏览器等客户端程序提供各种网络服务。然而，由于这些 Web 服务器在设计阶段就受到许多局限，例如当时的互联网用户规模、网络带宽、产品特点等局限，并且各自的定位与发展方向都不尽相同，使得每一款 Web 服务器的特点与应用场合都很鲜明。
 
@@ -53,7 +48,7 @@ Nginx 是一个跨平台的 Web 服务器，可运行在 Linux、FreeBSD、Solar
 
 2011 年 7 月，Nginx 正式成立公司，由 Igor Sysoev 担任 CTO，立足于提供商业级的 Web 服务器。
 
-### 1.2 为什么选择 Nginx
+## 1.2 为什么选择 Nginx
 
 为什么选择 Nginx？因为它具有以下特点：
 
@@ -109,11 +104,11 @@ Nginx 是一个跨平台的 Web 服务器，可运行在 Linux、FreeBSD、Solar
 
 快速增长的互联网用户群以及业内所有互联网服务提供商越来越好的用户体验，都促使我们在大流量服务中用 Nginx 取代其他 Web 服务器。Nginx 先天的事件驱动型设计、全异步的网络 I/O 处理机制、极少的进程间切换以及许多优化设计，都使得 Nginx 天生善于处理高并发压力下的互联网请求，同时 Nginx 降低了资源消耗，可以把服务器硬件资源“压榨”到极致。
 
-### 1.3 准备工作
+## 1.3 准备工作
 
 由于 Linux 具有免费、使用广泛、商业支持越来越完善等特点，本书将主要针对 Linux 上运行的 Nginx 来进行介绍。需要说明的是，本书不是使用手册，而是介绍 Nginx 作为 Web 服务器的设计思想，以及如何更有效地使用 Nginx 达成目的，而这些内容在各操作系统上基本是相通的（除了第 9 章关于事件驱动方式以及第 14 章的进程间同步方式在类 UNIX 操作系统上略有不同以外）。
 
-#### 1.3.1 Linux 操作系统
+### 1.3.1 Linux 操作系统
 
 首先我们需要一个内核为 Linux 2.6 及以上版本的操作系统，因为 Linux 2.6 及以上内核才支持 epoll，而在 Linux 上使用 select 或 poll 来解决事件的多路复用，是无法解决高并发压力问题的。
 
@@ -126,7 +121,7 @@ Linux wehf2wng001 2.6.18-128.el5 #1 SMP Wed Jan 21 10:41:14 EST 2009 x86_64 x86_
 
 执行结果表明内核版本是 2.6.18，符合我们的要求。
 
-#### 1.3.2 使用 Nginx 的必备软件
+### 1.3.2 使用 Nginx 的必备软件
 
 如果要使用 Nginx 的常用功能，那么首先需要确保该操作系统上至少安装了如下软件。
 
@@ -182,7 +177,7 @@ Linux wehf2wng001 2.6.18-128.el5 #1 SMP Wed Jan 21 10:41:14 EST 2009 x86_64 x86_
 
 Nginx 是高度自由化的 Web 服务器，它的功能是由许多模块来支持的。而这些模块可根据我们的使用需求来定制，如果某些模块不需要使用则完全不必理会它。同样，如果使用了某个模块，而这个模块使用了一些类似 zlib 或 OpenSSL 等的第三方库，那么就必须先安装这些软件。
 
-#### 1.3.3 磁盘目录
+### 1.3.3 磁盘目录
 
 要使用 Nginx，还需要在 Linux 文件系统上准备以下目录。
 
@@ -202,7 +197,7 @@ Nginx 是高度自由化的 Web 服务器，它的功能是由许多模块来支
 
    日志文件通常会比较大，当研究 Nginx 的底层架构时，需要打开 debug 级别的日志，这个级别的日志非常详细，会导致日志文件的大小增长得极快，需要预先分配一个拥有更大磁盘空间的目录。
 
-#### 1.3.4 Linux 内核参数的优化
+### 1.3.4 Linux 内核参数的优化
 
 由于默认的 Linux 内核参数考虑的是最通用的场景，这明显不符合用于支持高并发访问的 Web 服务器的定义，所以需要修改 Linux 内核参数，使得 Nginx 可以拥有更高的性能。
 
@@ -266,7 +261,7 @@ net.ipv4.tcp_max_syn_backlog = 1024
 
 - **tcp_syncookies**：该参数与性能无关，用于解决 TCP 的 SYN 攻击。
 
-#### 1.3.5 获取 Nginx 源码
+### 1.3.5 获取 Nginx 源码
 
 可以在 Nginx 官方网站（nginx.org/en/download.html）获取 Nginx 源码包。将下载的 nginx-1.0.14.tar.gz 源码压缩包放置到准备好的 Nginx 源代码目录中，然后解压。例如：
 
@@ -278,7 +273,7 @@ tar -zxvf nginx-1.0.14.tar.gz
 
 图 1-2 Nginx 的不同版本
 
-### 1.4 编译安装 Nginx
+## 1.4 编译安装 Nginx
 
 安装 Nginx 最简单的方式是，进入 nginx-1.0.14 目录后执行以下 3 行命令：
 
@@ -294,11 +289,11 @@ make 命令根据 configure 命令生成的 Makefile 文件编译 Nginx 工程�
 
 make install 命令根据 configure 执行时的参数将 Nginx 部署到指定的安装目录，包括相关目录的建立和二进制文件、配置文件的复制。
 
-### 1.5 configure 详解
+## 1.5 configure 详解
 
 可以看出，configure 命令至关重要，下文将详细介绍如何使用 configure 命令，并分析 configure 到底是如何工作的，从中我们也可以看出 Nginx 的一些设计思想。
 
-#### 1.5.1 configure 的命令参数
+### 1.5.1 configure 的命令参数
 
 使用 help 命令可以查看 configure 包含的参数。
 
@@ -380,44 +375,44 @@ make install 命令根据 configure 执行时的参数将 Nginx 部署到指定�
 
    表 1-13 configure 提供的其他参数
 
-#### 1.5.2 configure 执行流程
+### 1.5.2 configure 执行流程
 
 我们看到 configure 命令支持非常多的参数，读者可能会好奇它在执行时到底做了哪些事情，本节将通过解析 configure 源码来对它有一个感性的认识。configure 由 Shell 脚本编写，中间会调用 `<nginx-source>/auto/` 目录下的脚本。这里将只对 configure 脚本本身做分析，对于它所调用的 auto 目录下的其他工具脚本则只做功能性的说明。
 
 configure 脚本的内容如下：
 
 ```bash
-#!/bin/sh
+!/bin/sh
 
-# Copyright (C) Igor Sysoev
-# Copyright (C) Nginx, Inc.
+ Copyright (C) Igor Sysoev
+ Copyright (C) Nginx, Inc.
 
-# auto/options 脚本处理 configure 命令的参数。例如，如果参数是 --help，那么显示支持的所有参数格式。
-# options 脚本会定义后续工作将要用到的变量，然后根据本次参数以及默认值设置这些变量
+ auto/options 脚本处理 configure 命令的参数。例如，如果参数是 --help，那么显示支持的所有参数格式。
+ options 脚本会定义后续工作将要用到的变量，然后根据本次参数以及默认值设置这些变量
 . auto/options
 
-# auto/init 脚本初始化后续将产生的文件路径。例如，Makefile、ngx*modules.c 等文件默认情况下将会在 <nginx-source>/objs/
+ auto/init 脚本初始化后续将产生的文件路径。例如，Makefile、ngx*modules.c 等文件默认情况下将会在 <nginx-source>/objs/
 . auto/init
 
-# auto/sources 脚本将分析 Nginx 的源码结构，这样才能构造后续的 Makefile 文件
+ auto/sources 脚本将分析 Nginx 的源码结构，这样才能构造后续的 Makefile 文件
 . auto/sources
 
-# 编译过程中所有目标文件生成的路径由 --builddir=DIR 参数指定，默认情况下为 <nginx-source>/objs，此时这个目录将会被创建
+ 编译过程中所有目标文件生成的路径由 --builddir=DIR 参数指定，默认情况下为 <nginx-source>/objs，此时这个目录将会被创建
 test -d $NGX_OBJS || mkdir $NGX_OBJS
 
-# 开始准备建立 ngx_auto_headers.h、autoconf.err 等必要的编译文件
+ 开始准备建立 ngx_auto_headers.h、autoconf.err 等必要的编译文件
 echo > $NGX_AUTO_HEADERS_H
 echo > $NGX_AUTOCONF_ERR
 
-# 向 objs/ngx_auto_config.h 写入命令行带的参数
+ 向 objs/ngx_auto_config.h 写入命令行带的参数
 echo "#define NGX_CONFIGURE \"$NGX_CONFIGURE\"" > $NGX_AUTO_CONFIG_H
 
-# 判断 DEBUG 标志，如果有，那么在 objs/ngx_auto_config.h 文件中写入 DEBUG 宏
+ 判断 DEBUG 标志，如果有，那么在 objs/ngx_auto_config.h 文件中写入 DEBUG 宏
 if [ $NGX_DEBUG = YES ]; then
     have=NGX_DEBUG . auto/have
 fi
 
-# 现在开始检查操作系统参数是否支持后续编译
+ 现在开始检查操作系统参数是否支持后续编译
 if test -z "$NGX_PLATFORM"; then
     echo "checking for OS"
     NGX_SYSTEM=`uname -s 2>/dev/null`
@@ -436,30 +431,30 @@ else
     NGX_SYSTEM=$NGX_PLATFORM
 fi
 
-# 检查并设置编译器，如 GCC 是否安装、GCC 版本是否支持后续编译 nginx
+ 检查并设置编译器，如 GCC 是否安装、GCC 版本是否支持后续编译 nginx
 . auto/cc/conf
 
-# 对非 Windows 操作系统定义一些必要的头文件，并检查其是否存在，以此决定 configure 后续步骤是否可以成功
+ 对非 Windows 操作系统定义一些必要的头文件，并检查其是否存在，以此决定 configure 后续步骤是否可以成功
 if [ "$NGX_PLATFORM" != win32 ]; then
     . auto/headers
 fi
 
-# 对于当前操作系统，定义一些特定的操作系统相关的方法并检查当前环境是否支持。例如，对于 Linux，在这里使用 sched_setaffinity 设置进程优先级，使用 Linux 特有的 sendfile 系统调用来加速向网络中发送文件块
+ 对于当前操作系统，定义一些特定的操作系统相关的方法并检查当前环境是否支持。例如，对于 Linux，在这里使用 sched_setaffinity 设置进程优先级，使用 Linux 特有的 sendfile 系统调用来加速向网络中发送文件块
 . auto/os/conf
 
-# 定义类 UNIX 操作系统中通用的头文件和系统调用等，并检查当前环境是否支持
+ 定义类 UNIX 操作系统中通用的头文件和系统调用等，并检查当前环境是否支持
 if [ "$NGX_PLATFORM" != win32 ]; then
     . auto/unix
 fi
 
-# 最核心的构造运行期 modules 的脚本。它将会生成 ngx_modules.c 文件，这个文件会被编译进 Nginx 中，其中它所做的唯一的事情就是定义了 ngx_modules 数组。
-# ngx_modules 指明 Nginx 运行期间有哪些模块会参与到请求的处理中，包括 HTTP 请求可能会使用哪些模块处理，因此，它对数组元素的顺序非常敏感，也就是说，绝大部分模块在 ngx_modules 数组中的顺序其实是固定的。例如，一个请求必须先执行 ngx_http_gzip_filter_module 模块重新修改 HTTP 响应中的头部后，才能使用 ngx_http_header_filter_module 模块按照 headers_in 结构体里的成员构造出以 TCP 流形式发送给客户端的 HTTP 响应头部。注意，我们在 --add-module= 参数里加入的第三方模块也在此步骤写入到 ngx_modules.c 文件中了
+ 最核心的构造运行期 modules 的脚本。它将会生成 ngx_modules.c 文件，这个文件会被编译进 Nginx 中，其中它所做的唯一的事情就是定义了 ngx_modules 数组。
+ ngx_modules 指明 Nginx 运行期间有哪些模块会参与到请求的处理中，包括 HTTP 请求可能会使用哪些模块处理，因此，它对数组元素的顺序非常敏感，也就是说，绝大部分模块在 ngx_modules 数组中的顺序其实是固定的。例如，一个请求必须先执行 ngx_http_gzip_filter_module 模块重新修改 HTTP 响应中的头部后，才能使用 ngx_http_header_filter_module 模块按照 headers_in 结构体里的成员构造出以 TCP 流形式发送给客户端的 HTTP 响应头部。注意，我们在 --add-module= 参数里加入的第三方模块也在此步骤写入到 ngx_modules.c 文件中了
 . auto/modules
 
-# conf 脚本用来检查 Nginx 在链接期间需要链接的第三方静态库、动态库或者目标文件是否存在
+ conf 脚本用来检查 Nginx 在链接期间需要链接的第三方静态库、动态库或者目标文件是否存在
 . auto/lib/conf
 
-# 处理 Nginx 安装后的路径
+ 处理 Nginx 安装后的路径
 case ".$NGX_PREFIX" in
     .)
         NGX_PREFIX=${NGX_PREFIX:-/usr/local/nginx}
@@ -473,12 +468,12 @@ case ".$NGX_PREFIX" in
         ;;
 esac
 
-# 处理 Nginx 安装后 conf 文件的路径
+ 处理 Nginx 安装后 conf 文件的路径
 if [ ".$NGX_CONF_PREFIX" != "." ]; then
     have=NGX_CONF_PREFIX value="\"$NGX_CONF_PREFIX/\"" . auto/define
 fi
 
-# 处理 Nginx 安装后，二进制文件、pid、lock 等其他文件的路径可参见 configure 参数中路径类选项的说明
+ 处理 Nginx 安装后，二进制文件、pid、lock 等其他文件的路径可参见 configure 参数中路径类选项的说明
 have=NGX_SBIN_PATH value="\"$NGX_SBIN_PATH\"" . auto/define
 have=NGX_CONF_PATH value="\"$NGX_CONF_PATH\"" . auto/define
 have=NGX_PID_PATH value="\"$NGX_PID_PATH\"" . auto/define
@@ -491,29 +486,29 @@ have=NGX_HTTP_FASTCGI_TEMP_PATH value="\"$NGX_HTTP_FASTCGI_TEMP_PATH\"" . auto/d
 have=NGX_HTTP_UWSGI_TEMP_PATH value="\"$NGX_HTTP_UWSGI_TEMP_PATH\"" . auto/define
 have=NGX_HTTP_SCGI_TEMP_PATH value="\"$NGX_HTTP_SCGI_TEMP_PATH\"" . auto/define
 
-# 创建编译时使用的 objs/Makefile 文件
+ 创建编译时使用的 objs/Makefile 文件
 . auto/make
 
-# 为 objs/Makefile 加入需要连接的第三方静态库、动态库或者目标文件
+ 为 objs/Makefile 加入需要连接的第三方静态库、动态库或者目标文件
 . auto/lib/make
 
-# 为 objs/Makefile 加入 install 功能，当执行 make install 时将编译生成的必要文件复制到安装路径，建立必要的目录
+ 为 objs/Makefile 加入 install 功能，当执行 make install 时将编译生成的必要文件复制到安装路径，建立必要的目录
 . auto/install
 
-# 在 ngx_auto_config.h 文件中加入 NGX_SUPPRESS_WARN 宏、NGX_SMP 宏
+ 在 ngx_auto_config.h 文件中加入 NGX_SUPPRESS_WARN 宏、NGX_SMP 宏
 . auto/stubs
 
-# 在 ngx_auto_config.h 文件中指定 NGX_USER 和 NGX_GROUP 宏，如果执行 configure 时没有参数指定，默认两者皆为 nobody（也就是默认以 nobody 用户运行进程）
+ 在 ngx_auto_config.h 文件中指定 NGX_USER 和 NGX_GROUP 宏，如果执行 configure 时没有参数指定，默认两者皆为 nobody（也就是默认以 nobody 用户运行进程）
 have=NGX_USER value="\"$NGX_USER\"" . auto/define
 have=NGX_GROUP value="\"$NGX_GROUP\"" . auto/define
 
-# 显示 configure 执行的结果，如果失败，则给出原因
+ 显示 configure 执行的结果，如果失败，则给出原因
 . auto/summary
 ```
 
 （注：在 configure 脚本里检查某个特性是否存在时，会生成一个最简单的只包含 main 函数的 C 程序，该程序会包含相应的头文件。然后，通过检查是否可以编译通过来确认特性是否支持，并将结果记录在 objs/autoconf.err 文件中。后续检查头文件、检查特性的脚本都用了类似的方法。）
 
-#### 1.5.3 configure 生成的文件
+### 1.5.3 configure 生成的文件
 
 当 configure 执行成功时会生成 objs 目录，并在该目录下产生以下目录和文件：
 
@@ -610,7 +605,7 @@ have=NGX_GROUP value="\"$NGX_GROUP\"" . auto/define
 
 configure 除了生成 Makefile 外，还生成了 ngx_modules.c 文件，它决定了运行时所有模块的优先级（在编译过程中而不是编码过程中）。对于不需要的模块，既不会加入 ngx_modules 数组，也不会编译进 Nginx 产品中，这也体现了轻量级的概念。
 
-#### 1.6 Nginx 的命令行控制
+### 1.6 Nginx 的命令行控制
 
 在 Linux 中，需要使用命令行来控制 Nginx 服务器的启动与停止、重载配置文件、回滚日志文件、平滑升级等行为。默认情况下，Nginx 被安装在目录 /usr/local/nginx/ 中，其二进制文件路径为 /usr/local/nginx/sbin/nginx，配置文件路径为 /usr/local/nginx/conf/nginx.conf。当然，在 configure 执行时是可以指定把它们安装在不同目录的。为了简单起见，本节只说明默认安装情况下的命令行的使用情况，如果读者安装的目录发生了变化，那么替换一下即可。
 
@@ -800,6 +795,6 @@ configure 除了生成 Makefile 外，还生成了 ngx_modules.c 文件，它决
 
     使用 -h 或者 -? 参数会显示支持的所有命令行参数。
 
-### 1.7 小结
+## 1.7 小结
 
 本章介绍了 Nginx 的特点以及在什么场景下需要使用 Nginx，同时介绍了如何获取 Nginx 以及如何配置、编译、安装运行 Nginx。本章还深入介绍了最为复杂的 configure 过程，这部分内容是学习本书第二部分和第三部分的基础。

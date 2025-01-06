@@ -5,7 +5,8 @@ import { DefaultTheme } from "vitepress";
 
 function generateSideBar(
   FolderName: string,
-  FindDir: string
+  FindDir: string,
+  Collapsed?:boolean
 ): DefaultTheme.SidebarItem[] {
   const docs = resolve(__dirname, `../../${FolderName}`);
   const files = readdirSync(FindDir);
@@ -15,12 +16,17 @@ function generateSideBar(
       items: [],
     },
   ];
+  if(Collapsed) result[0].collapsed = true;
   for (const file of files) {
     const fullPath = resolve(FindDir, file);
     const stat = statSync(fullPath);
     if (stat.isDirectory()) {
-      generateSideBar(FolderName, fullPath).forEach((item) =>
+      result[0].items?.push(
+        { collapsed: false }
+      )
+      generateSideBar(FolderName, fullPath, true).forEach((item) => {
         result[0].items?.push(item)
+      }
       );
     } else if (
       stat.isFile() &&
@@ -42,9 +48,10 @@ const getMdTitle = (md: string) => {
   if (existsSync(md)) {
     const MdContent = readFileSync(md, "utf8");
     const titleMatch = MdContent.match(/^# (.*)$/m);
-    return titleMatch ? titleMatch[1] : basename(md.replace(".md", ""));
+    return titleMatch ? titleMatch[1] : retrim(basename(md.replace(".md", "")));
   }
-  return basename(resolve(md, `..`));
+
+  return retrim(basename(resolve(md, `..`)));
 };
 
 export default function makeSidebar(FolderName: string) {
@@ -57,4 +64,16 @@ export default function makeSidebar(FolderName: string) {
   };
 }
 
-// console.log(makeSidebar("Learn"));
+// console.log(makeSidebar("Nginx"));
+
+const retrim = (str:string,chars?:string)=>
+{
+  chars = chars?chars:" 1234567890.-_";
+  const charSet = new Set(chars);
+  let pos = 0;
+  while(pos < str.length && charSet.has(str[pos])) pos++;
+  return str.slice(pos);
+}
+
+// console.log(retrim("1-2.3.2yourname"," 1234567890-."));
+

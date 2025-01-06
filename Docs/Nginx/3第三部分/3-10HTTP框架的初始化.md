@@ -1,4 +1,8 @@
-## 第 10 章 HTTP 框架的初始化
+---
+outline: [2, 3]
+---
+
+# 第 10 章 HTTP 框架的初始化
 
 从本章开始将探讨事件消费模块的“大户”——HTTP 模块。Nginx 作为 Web 服务器，其
 HTTP 模块的数量远超过了其他 4 类模块（核心模块、事件模块、配置模块、邮件模块），其
@@ -229,7 +233,7 @@ location 后，ngx_http_mytest_conf_t 结构体中的成员将是 loc 级别下�
 
 下面介绍一下 ngx_http_module 模块在实现上是如何体现上述思路的。
 
-### 10.2.1 管理 main 级别下的配置项
+## 10.2.1 管理 main 级别下的配置项
 
 上文说过，在解析 HTTP 模块定义的 main 级别配置项时，将会分别调用每个 HTTP 模块的 create_main_conf、create_srv_conf、create_loc_conf 方法建立 3 个结构体，分别用于存储全局、server 相关的、location 相关的配置项，但它们究竟是以何种数据结构保存的呢？与核心结构体 ngx_cycle_t 中的 conf_ctx 指针又有什么样的关系呢？在图 10-10 中的第 2 步~第 7 步包含了解析 main 级别配置项的所有流程，而图 10-1 将会展现它们在内存中的布局，可以看到，其中 ngx_http_core_module 模块完成了 HTTP 框架的大部分功能，而它又是第 1 个 HTTP 模块，因此，它使用到的 3 个结构体（ngx_http_core_main_conf_t、ngx_http_core_srv_conf_t、ngx_http_core_loc_conf_t）也是用户非常关心的。
 

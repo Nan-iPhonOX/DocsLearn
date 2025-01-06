@@ -2,21 +2,13 @@
 outline: [2, 3]
 ---
 
-# 第二部分如何编写 HTTP 模块
-
--   第 3 章开发一个简单的 HTTP 模块
--   第 4 章配置、error 日志和请求上下文
--   第 5 章访问第三方服务
--   第 6 章开发一个简单的 HTTP 过滤模块
--   第 7 章 Nginx 提供的高级数据结构
-
-## 第 3 章开发一个简单的 HTTP 模块
+# 第 3 章 开发一个简单的 HTTP 模块
 
 当通过开发 HTTP 模块来实现产品功能时，是可以完全享用 Nginx 的优秀设计所带来的、与官方模块相同的高并发特性的。不过，如何开发一个充满异步调用、无阻塞的 HTTP 模块呢？首先，需要把程序嵌入到 Nginx 中，也就是说，最终编译出的二进制程序 Nginx 要包含我们的代码（见 [3.3 节](#_3-3-如何将自己的-http-模块编译进-nginx)）；其次，这个全新的 HTTP 模块要能介入到 HTTP 请求的处理流程中（具体参见 [3.1 节](#_3-1-如何调用-http-模块)、[3.4 节](#_3-4-http-模块的数据结构)、[3.5 节](#_3-5-定义自己的-http-模块)）。满足上述两个前提后，我们的模块才能开始处理 HTTP 请求，但在开始处理请求前还需要先了解一些 Nginx 框架定义的数据结构（见 [3.2 节](#_3-2-准备工作)），这是后面必须要用到的；正式处理请求时，还要可以获得 Nginx 框架接收、解析后的用户请求信息（见 [3.6 节](#_3-6-处理用户请求)）；业务执行完毕后，则要考虑发送响应给用户（见 [3.7 节](#_3-7-发送响应)），包括将磁盘中的文件以 HTTP 包体的形式发送给用户（见 [3.8 节](#_3-8-将磁盘文件作为包体发送)）。
 
 本章最后会讨论如何用 C++语言来编写 HTTP 模块，这虽然不是 Nginx 官方倡导的方式，但 C++向前兼容 C 语言，使用 C++语言开发的模块还是可以很容易地嵌入到 Nginx 中。本章不会深入探讨 HTTP 模块与 Nginx 的各个核心模块是如何配合工作的，而且这部分提到的每个接口将只涉及用法而不涉及实现原理，在第 3 部分我们才会进一步阐述本章提到的许多接口是如何实现异步访问的。
 
-### 3.1 如何调用 HTTP 模块
+## 3.1 如何调用 HTTP 模块
 
 在开发 HTTP 模块前，首先需要了解典型的 HTTP 模块是如何介入 Nginx 处理用户请求流程的。图 3-1 是一个简化的时序图，这里省略了许多异步调用，忽略了多个不同的 HTTP 处理阶段，仅标识了在一个典型请求的处理过程中主要模块被调用的流程，以此帮助读者理解 HTTP 模块如何处理用户请求。完整的流程将在第 11 章中详细介绍。
 
@@ -49,7 +41,7 @@ graph LR
 
 开发 HTTP 模块时，首先要注意的就是 HTTP 框架到具体的 HTTP 模块间数据流的传递，以及开发的 HTTP 模块如何与诸多的过滤模块协同工作（第 10 章、第 11 章会详细介绍 HTTP 框架）。下面正式进入 HTTP 模块的开发环节。
 
-### 3.2 准备工作
+## 3.2 准备工作
 
 Nginx 模块需要使用 C（或者 C++）语言编写代码来实现，每个模块都要有自己的名字。
 
@@ -63,7 +55,7 @@ Nginx 模块需要使用 C（或者 C++）语言编写代码来实现，每个�
 
 为了做到跨平台，Nginx 定义、封装了一些基本的数据结构。由于 Nginx 对内存分配比较“吝啬”（只有保证低内存消耗，才可能实现十万甚至百万级别的同时并发连接数），所以这些 Nginx 数据结构天生都是尽可能少占用内存。下面介绍本章中将要用到的 Nginx 定义的几个基本数据结构和方法，在第 7 章还会介绍一些复杂的容器，读者可以从中体会到如何才能有效地利用内存。
 
-#### 3.2.1 整型的封装
+### 3.2.1 整型的封装
 
 Nginx 使用 ngx_int_t 封装有符号整型，使用 ngx_uint_t 封装无符号整型。Nginx 各模块的变量定义都是如此使用的，建议读者沿用 Nginx 的习惯，以此替代 int 和 unsigned int。
 
@@ -74,7 +66,7 @@ typedef intptr_t ngx_int_t;
 typedef uintptr_t ngx_uint_t;
 ```
 
-#### 3.2.2 ngx_str_t 数据结构
+### 3.2.2 ngx_str_t 数据结构
 
 在 Nginx 的领域中，ngx_str_t 结构就是字符串。ngx_str_t 的定义如下：
 
@@ -98,12 +90,12 @@ if (0 == ngx_strncmp(
 这里，ngx_strncmp 其实就是 strncmp 函数，为了跨平台 Nginx 习惯性地对其进行了名称上的封装，下面看一下它的定义：
 
 ```c
-#define ngx_strncmp(s1, s2, n) strncmp((const char *) s1, (const char *) s2, n)
+define ngx_strncmp(s1, s2, n) strncmp((const char *) s1, (const char *) s2, n)
 ```
 
 任何试图将 ngx_str_t 的 data 成员当做字符串来使用的情况，都可能导致内存越界！Nginx 使用 ngx_str_t 可以有效地降低内存使用量。例如，用户请求“GET/testa=1 HTTP/1.1\r\n”存储到内存地址 0x1d0b0110 上，这时只需要把 r->method_name 设置为{len=3,data=0x1d0b0110}就可以表示方法名“GET”，而不需要单独为 method_name 再分配内存冗余的存储字符串。
 
-#### 3.2.3 ngx_list_t 数据结构
+### 3.2.3 ngx_list_t 数据结构
 
 ngx_list_t 是 Nginx 封装的链表容器，它在 Nginx 中使用得很频繁，例如 HTTP 的头部就是用 ngx_list_t 来存储的。当然，C 语言封装的链表没有 C++或 Java 等面向对象语言那么容易理解。
 
@@ -249,7 +241,7 @@ for (i = 0; /* void */; i++) {
 }
 ```
 
-#### 3.2.4 ngx_table_elt_t 数据结构
+### 3.2.4 ngx_table_elt_t 数据结构
 
 ngx_table_elt_t 数据结构如下所示：
 
@@ -266,7 +258,7 @@ typedef struct {
 
 显而易见，ngx_table_elt_t 是为 HTTP 头部“量身订制”的，其中 key 存储头部名称（如 Content-Length），value 存储对应的值（如“1024”），lowcase_key 是为了忽略 HTTP 头部名称的大小写（例如，有些客户端发来的 HTTP 请求头部是 content-length，Nginx 希望它与大小写敏感的 Content-Length 做相同处理，有了全小写的 lowcase_key 成员后就可以快速达成目的了），hash 用于快速检索头部（它的用法在 3.6.3 节中进行详述）。
 
-#### 3.2.5 ngx_buf_t 数据结构
+### 3.2.5 ngx_buf_t 数据结构
 
 缓冲区 ngx_buf_t 是 Nginx 处理大数据的关键数据结构，它既应用于内存数据也应用于磁盘数据。下面主要介绍 ngx_buf_t 结构体本身，而描述磁盘文件的 ngx_file_t 结构体则在 3.8.1 节中说明。下面来看一下相关代码：
 
@@ -317,7 +309,7 @@ unsigned temp_file:1;
 
 关于使用 ngx_buf_t 的案例参见 3.7.2 节。ngx_buf_t 是一种基本数据结构，本质上它提供的仅仅是一些指针成员和标志位。对于 HTTP 模块来说，需要注意 HTTP 框架、事件框架是如何设置和使用 pos、last 等指针以及如何处理这些标志位的，上述说明只是最常见的用法。（如果我们自定义一个 ngx_buf_t 结构体，不应当受限于上述用法，而应该根据业务需求自行定义。例如，在 13.7 节中用一个 ngx_buf_t 缓冲区转发上下游 TCP 流时，pos 会指向将要发送到下游的 TCP 流起始地址，而 last 会指向预备接收上游 TCP 流的缓冲区起始地址。）
 
-#### 3.2.6 ngx_chain_t 数据结构
+### 3.2.6 ngx_chain_t 数据结构
 
 ngx_chain_t 是与 ngx_buf_t 配合使用的链表数据结构，下面看一下它的定义：
 
@@ -333,7 +325,7 @@ buf 指向当前的 ngx_buf_t 缓冲区，next 则用来指向下一个 ngx_chai
 
 在向用户发送 HTTP 包体时，就要传入 ngx_chain_t 链表对象，注意，如果是最后一个 ngx_chain_t，那么必须将 next 置为 NULL，否则永远不会发送成功，而且这个请求将一直不会结束（Nginx 框架的要求）。
 
-### 3.3 如何将自己的 HTTP 模块编译进 Nginx
+## 3.3 如何将自己的 HTTP 模块编译进 Nginx
 
 Nginx 提供了一种简单的方式将第三方的模块编译到 Nginx 中。首先把源代码文件全部放到一个目录下，同时在该目录中编写一个文件用于通知 Nginx 如何编译本模块，这个文件名必须为 config。它的格式将在 3.3.1 节中说明。
 
@@ -341,7 +333,7 @@ Nginx 提供了一种简单的方式将第三方的模块编译到 Nginx 中。�
 
 有时，Nginx 提供的这种方式可能无法满足我们的需求，其实，在执行完 configure 脚本后 Nginx 会生成 objs/Makefile 和 objs/ngx_modules.c 文件，完全可以自己去修改这两个文件，这是一种更强大也复杂得多的方法，我们将在 3.3.3 节中说明如何直接修改它们。
 
-#### 3.3.1 config 文件的写法
+### 3.3.1 config 文件的写法
 
 config 文件其实是一个可执行的 Shell 脚本。如果只想开发一个 HTTP 模块，那么 config 文件中需要定义以下 3 个变量：
 
@@ -366,7 +358,7 @@ NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_http_mytest_module.c"
 
 注意以上 3 个变量并不是唯一可以在 config 文件中自定义的部分。如果我们不是开发 HTTP 模块，而是开发一个 HTTP 过滤模块，那么就要用 HTTP_FILTER_MODULES 替代上面的 HTTP_MODULES 变量。事实上，包括$CORE_MODULES、$EVENT_MODULES、$HTTP_MODULES、$HTTP_FILTER_MODULES、$HTTP_HEADERS_FILTER_MODULE 等模块变量都可以重定义，它们分别对应着 Nginx 的核心模块、事件模块、HTTP 模块、HTTP过滤模块、HTTP 头部过滤模块。除了 NGX_ADDON_SRCS 变量，或许还有一个变量我们会用到，即$NGX_ADDON_DEPS 变量，它指定了模块依赖的路径，同样可以在 config 中设置。
 
-#### 3.3.2 利用 configure 脚本将定制的模块加入到 Nginx 中
+### 3.3.2 利用 configure 脚本将定制的模块加入到 Nginx 中
 
 在 1.6 节提到的 configure 执行流程中，其中有两行脚本负责将第三方模块加入到 Nginx 中，如下所示。
 
@@ -503,7 +495,7 @@ END
 
 综上可知，第三方模块就是这样嵌入到 Nginx 程序中的。
 
-#### 3.3.3 直接修改 Makefile 文件
+### 3.3.3 直接修改 Makefile 文件
 
 3.3.2 节中介绍的方法毫无疑问是最方便的，因为大量的工作已由 Nginx 中的 configure 脚本帮我们做好了。在使用其他第三方模块时，一般也推荐使用该方法。
 
@@ -559,7 +551,7 @@ objs/ngx_modules.o \
 请慎用这种直接修改 Makefile 和 ngx_modules.c 的方法，不正确的修改可能导致 Nginx 工作
 不正常。
 
-### 3.4 HTTP 模块的数据结构
+## 3.4 HTTP 模块的数据结构
 
 定义 HTTP 模块方式很简单，例如：
 
@@ -719,10 +711,10 @@ struct ngx_command_s
 ngx_null_command 只是一个空的 ngx_command_t，如下所示：
 
 ```c
-#define ngx_null_command { ngx_null_string, 0, NULL, 0, 0, NULL }
+define ngx_null_command { ngx_null_string, 0, NULL, 0, 0, NULL }
 ```
 
-### 3.5 定义自己的 HTTP 模块
+## 3.5 定义自己的 HTTP 模块
 
 上文中我们了解了定义 HTTP 模块时需要定义哪些成员以及实现哪些方法，但在定义 HTTP 模块前，首先需要确定自定义的模块应当在什么样的场景下开始处理用户请求，也就是说，先要弄清楚我们的模块是如何介入到 Nginx 处理用户请求的流程中的。从 2.4 节中的 HTTP 配置项意义可知，一个 HTTP 请求会被许多个配置项控制，实际上这是因为一个 HTTP 请求可以被许多个 HTTP 模块同时处理。这样一来，肯定会有一个先后问题，也就是说，谁先处理请求谁的“权力”就更大。例如，ngx_http_access_module 模块的 deny 选项一旦得到满足后，Nginx 就会决定拒绝来自某个 IP 的请求，后面的诸如 root 这种访问静态文件的处理方式是得不到执行的。另外，由于同一个配置项可以从属于许多个 server、location 配置块，那么这个配置项将会针对不同的请求起作用。因此，现在面临的问题是，我们希望自己的模块在哪个时刻开始处理请求？是希望自己的模块对到达 Nginx 的所有请求都起作用，还是希望只对某一类请求（如 URI 匹配了 location 后表达式的请求）起作用？Nginx 的 HTTP 框架定义了非常多的用法，我们有很大的自由来定义自己的模块如何介入 HTTP 请求的处理，但本章只想说明最简单、最常见的 HTTP 模块应当如何编写，因此，我们这样定义第一个 HTTP 模块介入 Nginx 的方式： 1）不希望模块对所有的 HTTP 请求起作用。 2）在 nginx.conf 文件中的 http{}、server{}或者 location{}块内定义 mytest 配置项，如果一个用户请求通过主机域名、URI 等匹配上了相应的配置块，而这个配置块下又具有 mytest 配置项，那么希望 mytest 模块开始处理请求。在这种介入方式下，模块处理请求的顺序是固定的，即必须在 HTTP 框架定义的 NGX_HTTP_CONTENT_PHASE 阶段开始处理请求，具体内容下文详述。
 
@@ -841,7 +833,7 @@ ngx_module_t ngx_http_mytest_module = {
 
 这样，mytest 模块在编译时将会被加入到 ngx_modules 全局数组中。Nginx 在启动时，会调用所有模块的初始化回调方法，当然，这个例子中我们没有实现它们（也没有实现 HTTP 框架初始化时会调用的 ngx_http_module_t 中的 8 个方法）。
 
-### 3.6 处理用户请求
+## 3.6 处理用户请求
 
 本节介绍如何处理一个实际的 HTTP 请求。回顾一下上文，在出现 mytest 配置项时， ngx_http_mytest 方法会被调用，这时将 ngx_http_core_loc_conf_t 结构的 handler 成员指定为 ngx_http_mytest_handler，另外，HTTP 框架在接收完 HTTP 请求的头部后，会调用 handler 指向的方法。下面看一下 handler 成员的原型 ngx_http_handler_pt：
 
@@ -851,49 +843,49 @@ typedef ngx_int_t (*ngx_http_handler_pt)(ngx_http_request_t *r);
 
 从上面这段代码可以看出，实际处理请求的方法 ngx_http_mytest_handler 将接收一个 ngx_http_request_t 类型的参数 r，返回一个 ngx_int_t（参见 3.2.1 节）类型的结果。下面先探讨一下 ngx_http_mytest_handler 方法可以返回什么，再看一下参数 r 包含了哪些 Nginx 已经解析完的用户请求信息。
 
-#### 3.6.1 处理方法的返回值
+### 3.6.1 处理方法的返回值
 
 这个返回值可以是 HTTP 中响应包的返回码，其中包括了 HTTP 框架已经在/src/http/ngx_http_request.h 文件中定义好的宏，如下所示。
 
 ```c
-#define NGX_HTTP_OK 200
-#define NGX_HTTP_CREATED 201
-#define NGX_HTTP_ACCEPTED 202
-#define NGX_HTTP_NO_CONTENT 204
-#define NGX_HTTP_PARTIAL_CONTENT 206
-#define NGX_HTTP_SPECIAL_RESPONSE 300
-#define NGX_HTTP_MOVED_PERMANENTLY 301
-#define NGX_HTTP_MOVED_TEMPORARILY 302
-#define NGX_HTTP_SEE_OTHER 303
-#define NGX_HTTP_NOT_MODIFIED 304
-#define NGX_HTTP_TEMPORARY_REDIRECT 307
-#define NGX_HTTP_BAD_REQUEST 400
-#define NGX_HTTP_UNAUTHORIZED 401
-#define NGX_HTTP_FORBIDDEN 403
-#define NGX_HTTP_NOT_FOUND 404
-#define NGX_HTTP_NOT_ALLOWED 405
-#define NGX_HTTP_REQUEST_TIME_OUT 408
-#define NGX_HTTP_CONFLICT 409
-#define NGX_HTTP_LENGTH_REQUIRED 411
-#define NGX_HTTP_PRECONDITION_FAILED 412
-#define NGX_HTTP_REQUEST_ENTITY_TOO_LARGE 413
-#define NGX_HTTP_REQUEST_URI_TOO_LARGE 414
-#define NGX_HTTP_UNSUPPORTED_MEDIA_TYPE 415
-#define NGX_HTTP_RANGE_NOT_SATISFIABLE 416
+define NGX_HTTP_OK 200
+define NGX_HTTP_CREATED 201
+define NGX_HTTP_ACCEPTED 202
+define NGX_HTTP_NO_CONTENT 204
+define NGX_HTTP_PARTIAL_CONTENT 206
+define NGX_HTTP_SPECIAL_RESPONSE 300
+define NGX_HTTP_MOVED_PERMANENTLY 301
+define NGX_HTTP_MOVED_TEMPORARILY 302
+define NGX_HTTP_SEE_OTHER 303
+define NGX_HTTP_NOT_MODIFIED 304
+define NGX_HTTP_TEMPORARY_REDIRECT 307
+define NGX_HTTP_BAD_REQUEST 400
+define NGX_HTTP_UNAUTHORIZED 401
+define NGX_HTTP_FORBIDDEN 403
+define NGX_HTTP_NOT_FOUND 404
+define NGX_HTTP_NOT_ALLOWED 405
+define NGX_HTTP_REQUEST_TIME_OUT 408
+define NGX_HTTP_CONFLICT 409
+define NGX_HTTP_LENGTH_REQUIRED 411
+define NGX_HTTP_PRECONDITION_FAILED 412
+define NGX_HTTP_REQUEST_ENTITY_TOO_LARGE 413
+define NGX_HTTP_REQUEST_URI_TOO_LARGE 414
+define NGX_HTTP_UNSUPPORTED_MEDIA_TYPE 415
+define NGX_HTTP_RANGE_NOT_SATISFIABLE 416
 /* The special code to close connection without any response */
-#define NGX_HTTP_CLOSE 444
-#define NGX_HTTP_NGINX_CODES 494
-#define NGX_HTTP_REQUEST_HEADER_TOO_LARGE 494
-#define NGX_HTTPS_CERT_ERROR 495
-#define NGX_HTTPS_NO_CERT 496
-#define NGX_HTTP_TO_HTTPS 497
-#define NGX_HTTP_CLIENT_CLOSED_REQUEST 499
-#define NGX_HTTP_INTERNAL_SERVER_ERROR 500
-#define NGX_HTTP_NOT_IMPLEMENTED 501
-#define NGX_HTTP_BAD_GATEWAY 502
-#define NGX_HTTP_SERVICE_UNAVAILABLE 503
-#define NGX_HTTP_GATEWAY_TIME_OUT 504
-#define NGX_HTTP_INSUFFICIENT_STORAGE 507
+define NGX_HTTP_CLOSE 444
+define NGX_HTTP_NGINX_CODES 494
+define NGX_HTTP_REQUEST_HEADER_TOO_LARGE 494
+define NGX_HTTPS_CERT_ERROR 495
+define NGX_HTTPS_NO_CERT 496
+define NGX_HTTP_TO_HTTPS 497
+define NGX_HTTP_CLIENT_CLOSED_REQUEST 499
+define NGX_HTTP_INTERNAL_SERVER_ERROR 500
+define NGX_HTTP_NOT_IMPLEMENTED 501
+define NGX_HTTP_BAD_GATEWAY 502
+define NGX_HTTP_SERVICE_UNAVAILABLE 503
+define NGX_HTTP_GATEWAY_TIME_OUT 504
+define NGX_HTTP_INSUFFICIENT_STORAGE 507
 ```
 
 注意以上返回值除了 RFC2616 规范中定义的返回码外，还有 Nginx 自身定义的 HTTP 返回码。例如，NGX_HTTP_CLOSE 就是用于要求 HTTP 框架直接关闭用户连接的。
@@ -950,7 +942,7 @@ if (r->content_handler) {
 -   NGX_DONE：表示到此为止，同时 HTTP 框架将暂时不再继续执行这个请求的后续部分。事实上，这时会检查连接的类型，如果是 keepalive 类型的用户请求，就会保持住 HTTP 连接，然后把控制权交给 Nginx。这个返回码很有用，考虑以下场景：在一个请求中我们必须访问一个耗时极长的操作（比如某个网络调用），这样会阻塞住 Nginx，又因为我们没有把控制权交还给 Nginx，而是在 ngx_http_mytest_handler 中让 Nginx worker 进程休眠了（如等待网络的回包），所以，这就会导致 Nginx 出现性能问题，该进程上的其他用户请求也得不到响应。可如果我们把这个耗时极长的操作分为上下两个部分（就像 Linux 内核中对中断处理的划分），上半部分和下半部分都是无阻塞的（耗时很少的操作），这样，在 ngx_http_mytest_handler 进入时调用上半部分，然后返回 NGX_DONE，把控制交还给 Nginx， 从而让 Nginx 继续处理其他请求。在下半部分被触发时（这里不探讨具体的实现方式，事实上使用 upstream 方式做反向代理时用的就是这种思想），再回调下半部分处理方法，这样就可以保证 Nginx 的高性能特性了。如果需要彻底了解 NGX_DONE 的意义，那么必须学习第 11 章内容，其中还涉及请求的引用计数内容。
 -   NGX_ERROR：表示错误。这时会调用 ngx_http_terminate_request 终止请求。如果还有 POST 子请求，那么将会在执行完 POST 请求后再终止本次请求。
 
-#### 3.6.2 获取 URI 和参数
+### 3.6.2 获取 URI 和参数
 
 请求的所有信息（如方法、URI、协议版本号和头部等）都可以在传入的 ngx_http_request_t 类型参数 r 中取得。ngx_http_request_t 结构体的内容很多，本节不会探讨 ngx_http_request_t 中所有成员的意义（ngx_http_request_t 结构体中的许多成员只有 HTTP 框架才感兴趣，在 11.3.1 节会更详细的说明），只介绍一下获取 URI 和参数的方法，这非常简单，因为 Nginx 提供了多种方法得到这些信息。下面先介绍相关成员的定义。
 
@@ -985,21 +977,21 @@ struct ngx_http_request_s {
 method 的类型是 ngx_uint_t（无符号整型），它是 Nginx 忽略大小写等情形时解析完用户请求后得到的方法类型，其取值范围如下所示。
 
 ```c
-#define NGX_HTTP_UNKNOWN 0x0001
-#define NGX_HTTP_GET 0x0002
-#define NGX_HTTP_HEAD 0x0004
-#define NGX_HTTP_POST 0x0008
-#define NGX_HTTP_PUT 0x0010
-#define NGX_HTTP_DELETE 0x0020
-#define NGX_HTTP_MKCOL 0x0040
-#define NGX_HTTP_COPY 0x0080
-#define NGX_HTTP_MOVE 0x0100
-#define NGX_HTTP_OPTIONS 0x0200
-#define NGX_HTTP_PROPFIND 0x0400
-#define NGX_HTTP_PROPPATCH 0x0800
-#define NGX_HTTP_LOCK 0x1000
-#define NGX_HTTP_UNLOCK 0x2000
-#define NGX_HTTP_TRACE 0x4000
+define NGX_HTTP_UNKNOWN 0x0001
+define NGX_HTTP_GET 0x0002
+define NGX_HTTP_HEAD 0x0004
+define NGX_HTTP_POST 0x0008
+define NGX_HTTP_PUT 0x0010
+define NGX_HTTP_DELETE 0x0020
+define NGX_HTTP_MKCOL 0x0040
+define NGX_HTTP_COPY 0x0080
+define NGX_HTTP_MOVE 0x0100
+define NGX_HTTP_OPTIONS 0x0200
+define NGX_HTTP_PROPFIND 0x0400
+define NGX_HTTP_PROPPATCH 0x0800
+define NGX_HTTP_LOCK 0x1000
+define NGX_HTTP_UNLOCK 0x2000
+define NGX_HTTP_TRACE 0x4000
 ```
 
 当需要了解用户请求中的 HTTP 方法时，应该使用 r-\>method 这个整型成员与以上 15 个宏进行比较，这样速度是最快的（如果使用 method_name 成员与字符串做比较，那么效率会差很多），大部分情况下推荐使用这种方式。除此之外，还可以用 method_name 取得用户请求中的方法名字符串，或者联合 request_start 与 method_end 指针取得方法名。method_name 是 ngx_str_t 类型，按照 3.2.2 节中介绍的方法使用即可。
@@ -1028,16 +1020,16 @@ http_protocol 的 data 成员指向用户请求中 HTTP 协议版本字符串的
 http_version 是 Nginx 解析过的协议版本，它的取值范围如下：
 
 ```c
-#define NGX_HTTP_VERSION_9 9
-#define NGX_HTTP_VERSION_10 1000
-#define NGX_HTTP_VERSION_11 1001
+define NGX_HTTP_VERSION_9 9
+define NGX_HTTP_VERSION_10 1000
+define NGX_HTTP_VERSION_11 1001
 ```
 
 建议使用 http_version 分析 HTTP 的协议版本。
 
 最后，使用 request_start 和 request_end 可以获取原始的用户请求行。
 
-#### 3.6.3 获取 HTTP 头部
+### 3.6.3 获取 HTTP 头部
 
 在 ngx_http_request_t\*r 中就可以取到请求中的 HTTP 头部，比如使用下面的成员：
 
@@ -1071,33 +1063,33 @@ ngx_table_elt_t *range;
 ngx_table_elt_t *if_range;
 ngx_table_elt_t *transfer_encoding;
 ngx_table_elt_t *expect;
-#if (NGX_HTTP_GZIP)
+if (NGX_HTTP_GZIP)
   ngx_table_elt_t *accept_encoding;
   ngx_table_elt_t *via;
-#endif
+endif
 
 ngx_table_elt_t *authorization;
 ngx_table_elt_t *keep_alive;
 
-#if (NGX_HTTP_PROXY || NGX_HTTP_REALIP || NGX_HTTP_GEO)
+if (NGX_HTTP_PROXY || NGX_HTTP_REALIP || NGX_HTTP_GEO)
   ngx_table_elt_t *x_forwarded_for;
-#endif
+endif
 
-#if (NGX_HTTP_REALIP)
+if (NGX_HTTP_REALIP)
   ngx_table_elt_t *x_real_ip;
-#endif
+endif
 
-#if (NGX_HTTP_HEADERS)
+if (NGX_HTTP_HEADERS)
   ngx_table_elt_t *accept;
   ngx_table_elt_t *accept_language;
-#endif
+endif
 
-#if (NGX_HTTP_DAV)
+if (NGX_HTTP_DAV)
 ngx_table_elt_t *depth;
 ngx_table_elt_t *destination;
 ngx_table_elt_t *overwrite;
 ngx_table_elt_t *date;
-#endif
+endif
 
 /* user 和 passwd 是只有 ngx_http_auth_basic_module 才会用到的成员，这里可以忽略 */
 ngx_str_t user;
@@ -1171,7 +1163,7 @@ for (i = 0;; i++) {
 
 对于常见的 HTTP 头部，直接获取 r-\>headers_in 中已经由 HTTP 框架解析过的成员即可， 而对于不常见的 HTTP 头部，需要遍历 r-\>headers_in.headers 链表才能获得。
 
-#### 3.6.4 获取 HTTP 包体
+### 3.6.4 获取 HTTP 包体
 
 HTTP 包体的长度有可能非常大，如果试图一次性调用并读取完所有的包体，那么多半会阻塞 Nginx 进程。HTTP 框架提供了一种方法来异步地接收包体：
 
@@ -1223,11 +1215,11 @@ ngx_http_discard_request_body 只是丢弃包体，不处理包体不就行了�
 
 接收完请求的包体后，可以在 r-\>request_body-\>temp_file-\>file 中获取临时文件（假定将 r-\>request_body_in_file_only 标志位设为 1，那就一定可以在这个变量获取到包体。更复杂的接收包体的方式本节暂不讨论）。file 是一个 ngx_file_t 类型，在 3.8 节会详细介绍它的用法。这里，我们可以从 r-\>request_body-\>temp_file-\>file.name 中获取 Nginx 接收到的请求包体所在文件的名称（包括路径）。
 
-### 3.7 发送响应
+## 3.7 发送响应
 
 请求处理完毕后，需要向用户发送 HTTP 响应，告知客户端 Nginx 的执行结果。HTTP 响应主要包括响应行、响应头部、包体三部分。发送 HTTP 响应时需要执行发送 HTTP 头部（发送 HTTP 头部时也会发送响应行）和发送 HTTP 包体两步操作。本节将以发送经典的“Hello World”为例来说明如何发送响应。
 
-#### 3.7.1 发送 HTTP 头部
+### 3.7.1 发送 HTTP 头部
 
 下面看一下 HTTP 框架提供的发送 HTTP 头部的方法，如下所示。
 
@@ -1320,7 +1312,7 @@ h->value.data = (u_char *) "TestValue";
 
 注意 ngx_http_send_header 方法会首先调用所有的 HTTP 过滤模块共同处理 headers_out 中定义的 HTTP 响应头部，全部处理完毕后才会序列化为 TCP 字符流发送到客户端，相关流程可参见 11.9.1 节。
 
-#### 3.7.2 将内存中的字符串作为包体发送
+### 3.7.2 将内存中的字符串作为包体发送
 
 调用 ngx_http_output_filter 方法即可向客户端发送 HTTP 响应包体，下面查看一下此方法的原型，如下所示。
 
@@ -1383,7 +1375,7 @@ return ngx_http_output_filter(r, &out);
 
 注意在向用户发送响应包体时，必须牢记 Nginx 是全异步的服务器，也就是说，不可以在进程的栈里分配内存并将其作为包体发送。当一直 ngx_http_output_filter 方法返回时，可能由于 TCP 连接上的缓冲区还不可写，所以导致 ngx_buf_t 缓冲区指向的内存还没有发送，可这时方法返回已把控制权交给 Nginx 了，又会导致栈里的内存被释放，最后就会造成内存越界错误。因此，在发送响应包体时，尽量将 ngx_buf_t 中的 pos 指针指向从内存池里分配的内存。
 
-#### 3.7.3 经典的“Hello World”示例
+### 3.7.3 经典的“Hello World”示例
 
 下面以经典的返回“Hello World”为例来编写一个最小的 HTTP 处理模块，以此介绍完整的 ngx_http_mytest_handler 处理方法。
 
@@ -1444,7 +1436,7 @@ static ngx *int_t ngx_http_mytest_handler(ngx_http_request_t *r)
 }
 ```
 
-### 3.8 将磁盘文件作为包体发送
+## 3.8 将磁盘文件作为包体发送
 
 上文讨论了如何将内存中的数据作为包体发送给客户端，而在发送文件时完全可以先把文件读取到内存中再向用户发送数据，但是这样做会有两个缺点：
 
@@ -1453,7 +1445,7 @@ static ngx *int_t ngx_http_mytest_handler(ngx_http_request_t *r)
 
 当然，Nginx 已经封装好了多种接口，以便将磁盘或者缓存中的文件发送给用户。
 
-#### 3.8.1 如何发送磁盘中的文件
+### 3.8.1 如何发送磁盘中的文件
 
 发送文件时使用的是 3.7 节中所介绍的接口。例如：
 
@@ -1499,22 +1491,22 @@ struct ngx_file_s {
 fd 是打开文件的句柄描述符，打开文件这一步需要用户自己来做。Nginx 简单封装了一个宏用来代替 open 系统的调用，如下所示。
 
 ```c
-#define ngx_open_file(name, mode, create, access) open((const char *) name, mode|create, access)
+define ngx_open_file(name, mode, create, access) open((const char *) name, mode|create, access)
 ```
 
 实际上，ngx_open_file 与 open 方法的区别不大，ngx_open_file 返回的是 Linux 系统的文件句柄。对于打开文件的标志位，Nginx 也定义了以下几个宏来加以封装。
 
 ```c
-#define NGX_FILE_RDONLY O_RDONLY
-#define NGX_FILE_WRONLY O_WRONLY
-#define NGX_FILE_RDWR O_RDWR
-#define NGX_FILE_CREATE_OR_OPEN O_CREAT
-#define NGX_FILE_OPEN 0
-#define NGX_FILE_TRUNCATE O_CREAT|O_TRUNC
-#define NGX_FILE_APPEND O_WRONLY|O_APPEND
-#define NGX_FILE_NONBLOCK O_NONBLOCK
-#define NGX_FILE_DEFAULT_ACCESS 0644
-#define NGX_FILE_OWNER_ACCESS 0600
+define NGX_FILE_RDONLY O_RDONLY
+define NGX_FILE_WRONLY O_WRONLY
+define NGX_FILE_RDWR O_RDWR
+define NGX_FILE_CREATE_OR_OPEN O_CREAT
+define NGX_FILE_OPEN 0
+define NGX_FILE_TRUNCATE O_CREAT|O_TRUNC
+define NGX_FILE_APPEND O_WRONLY|O_APPEND
+define NGX_FILE_NONBLOCK O_NONBLOCK
+define NGX_FILE_DEFAULT_ACCESS 0644
+define NGX_FILE_OWNER_ACCESS 0600
 ```
 
 因此，在打开文件时只需要把文件路径传递给 name 参数，并把打开方式传递给 mode、create、access 参数即可。例如：
@@ -1543,7 +1535,7 @@ typedef struct stat ngx_file_info_t;
 Nginx 不只对 stat 数据结构做了封装，对于由操作系统中获取文件信息的 stat 方法，Nginx 也使用一个宏进行了简单的封装，如下所示：
 
 ```c
-#define ngx_file_info(file, sb) stat((const char *) file, sb)
+define ngx_file_info(file, sb) stat((const char *) file, sb)
 ```
 
 因此，获取文件信息时可以先这样写：
@@ -1572,7 +1564,7 @@ b->file_last = b->file->info.st_size;
 
 注意当磁盘中有大量的小文件时，会占用 Linux 文件系统中过多的 inode 结构，这时，成熟的解决方案会把许多小文件合并成一个大文件。在这种情况下，当有需要时，只要把上面的 file_pos 和 file_last 设置为合适的偏移量，就可以只发送合并大文件中的某一块内容（原来的小文件），这样就可以大幅降低小文件数量。
 
-#### 3.8.2 清理文件句柄
+### 3.8.2 清理文件句柄
 
 Nginx 会异步地将整个文件高效地发送给用户，但是我们必须要求 HTTP 框架在响应发送完毕后关闭已经打开的文件句柄，否则将会出现句柄泄露问题。设置清理文件句柄也很简单，只需要定义一个 ngx_pool_cleanup_t 结构体（这是最简单的方法，HTTP 框架还提供了其他方式，在请求结束时回调各个 HTTP 模块的 cleanup 方法，将在第 11 章介绍），将我们刚得到的文件句柄等信息赋给它，并将 Nginx 提供的 ngx_pool_cleanup_file 函数设置到它的 handler 回调方法中即可。首先介绍一下 ngx_pool_cleanup_t 结构体。
 
@@ -1635,7 +1627,7 @@ ngx_pool_cleanup_add 用于告诉 HTTP 框架，在请求结束时调用 cln 的
 
 至此，HTTP 模块已经可以向客户端发送文件了。下面介绍一下如何支持多线程下载与断点续传。
 
-#### 3.8.3 支持用户多线程下载和断点续传
+### 3.8.3 支持用户多线程下载和断点续传
 
 RFC2616 规范中定义了 range 协议，它给出了一种规则使得客户端可以在一次请求中只下载完整文件的某一部分，这样就可支持客户端在开启多个线程的同时下载一份文件，其中每个线程仅下载文件的一部分，最后组成一个完整的文件。range 也支持断点续传，只要客户端记录了上次中断时已经下载部分的文件偏移量，就可以要求服务器从断点处发送文件之后的内容。
 
@@ -1649,7 +1641,7 @@ r->allow_ranges = 1;
 
 这样，我们就支持了多线程下载和断点续传功能。
 
-### 3.9 用 C++语言编写 HTTP 模块
+## 3.9 用 C++语言编写 HTTP 模块
 
 Nginx 及其官方模块都是由 C 语言开发的，那么能不能使用 C++语言来开发 Nginx 模块呢？ C 语言是面向过程的编程语言，C++则是面向对象的编程语言，面向对象与面向过程的优劣这里暂且不论，存在即合理。当我们由于各种原因需要使用 C++语言实现一个 Nginx 模块时 （例如，某个子功能是用 C++语言写成，或者开发团队对 C++语言更熟练，又或者就是喜欢使用 C++语言），尽管 Nginx 本身并没有提供相应的方法支持这样做，但由于 C 语言与 C++语言的近亲特性，我们还是可以比较容易达成此目的的。
 
@@ -1661,7 +1653,7 @@ Nginx 及其官方模块都是由 C 语言开发的，那么能不能使用 C++�
 
 下面详述如何实现上述两点内容。
 
-#### 3.9.1 编译方式的修改
+### 3.9.1 编译方式的修改
 
 Nginx 的 configure 脚本没有对 C++语言编译模块提供支持，因此，修改编译方式就有以下
 两种思路：
@@ -1697,7 +1689,7 @@ $(CXX) -c $(CFLAGS) $(ALL_INCS) \
 
 注意确保在操作系统上已经安装了 C++编译器。请参照 1.3.2 节中的方式安装 gcc_c++编译器。
 
-#### 3.9.2 程序中的符号转换
+### 3.9.2 程序中的符号转换
 
 C 语言与 C++语言最大的不同在于编译后的符号有差别（C++为了支持多种面向对象特性，如重载、类等，编译后的方法名与 C 语言完全不同），这可以通过 C++语言提供的 extern“C”{}来实现符号的互相识别。也就是说，在 C++语言开发的模块中，include 包含的 Nginx 官方头文件都需要使用 extern“C”括起来。例如：
 
@@ -1713,6 +1705,6 @@ extern "C" {
 
 另外，对于希望 Nginx 框架回调的类似于 ngx_http_mytest_handler 这样的方法也需要放在 extern“C”中。
 
-### 3.10 小结
+## 3.10 小结
 
 本章讲述了如何开发一个基本的 HTTP 模块，这里除了获取请求的包体外没有涉及异步处理问题。通过本章的学习，读者应该可以轻松地编写一个简单的 HTTP 模块了，既可以获取到用户请求中的任何信息，也可以发送任意的响应给用户。当然，处理方法必须是快速、无阻塞的，因为 Nginx 在调用例子中的 ngx_http_mytest_handler 方法时是阻塞了整个 Nginx 进程的，所以 ngx_http_mytest_handler 或类似的处理方法中是不能有耗时很长的操作的。
