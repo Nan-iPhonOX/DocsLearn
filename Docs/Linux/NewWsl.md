@@ -79,8 +79,67 @@ sudo apt-get install btrfs-progs
 ```bash
 #!/bin/bash
 
-# 默认不还原
+if [ "$EUID" -ne 0 ]; then
+    echo "Please run as root or sudo"
+    exit
+fi
+
+# 系统备份脚本
+
+# 设置忽略备份的目录
+EXCLUDE_DIR=(
+# System paths
+/proc/*
+/sys/*
+/tmp/*
+/run/*
+/mnt/*
+/media/*
+/dev/*
+/lost+found
+
+# Backup and cache directories
+/backup/*
+/var/log/*
+/var/cache/*
+/var/tmp/*
+/home/*/.cache/*
+/root/.cache/*
+
+# Custom excludes
+/home/**/dist/*
+/home/**/node_modules/*
+/home/**/vendor/*
+/home/**/cache/*
+/home/**/tmp/*
+/home/**/temp/*
+/home/**/.vscode-server/*
+/home/**/.git/*
+)
+
+# status
 RESTORE=false
+MOUNTED=false
+RC=0
+# 设置颜色
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
+# 如果未安装curl则安装
+if ! command -v curl &> /dev/null; then
+    sudo apt install -y curl
+fi
+
+# 如果未安装btrfs-progs则安装
+if ! command -v btrfs &> /dev/null; then
+    sudo apt install -y btrfs-progs
+fi
+
+# 如果未安装rsync则安装
+if ! command -v rsync &> /dev/null; then
+    sudo apt install -y rsync
+fi
 
 # 检查是否提供了时间参数
 if [ "$1" ]; then
@@ -88,20 +147,23 @@ if [ "$1" ]; then
     RESTORE_TIME="$1"
 fi
 
-# 备份源目录
+# 备份Debian
 SOURCE_DIR="/"
 
 # VHDX 文件路径
 VHDX_FILE="/mnt/x/WSL/backup/backup.vhdx"
-
-# 挂载点
+# 挂载目录
 MOUNT_POINT="/mnt/backup"
+# 快照目录
+SNAPSHAOT_DIR="/mnt/backup/snapshot"
+# 系统备份目录
+BACKUP_DIR="/mnt/backup/Debian"
 
-# 检查 VHDX 文件是否存在
+# 检查 VHDX 文件是否存在 大小100g
 if [ ! -f "$VHDX_FILE" ]; then
-    echo "VHDX 文件不存在: $VHDX_FILE"
+    echo -e "${RED}VHDX 文件不存在: $VHDX_FILE${NC}"
     echo "创建新的 VHDX 文件..."
-    dd if=/dev/zero of=$VHDX_FILE bs=1M count=10240
+    dd if=/dev/zero of=$VHDX_FILE bs=1M count=102400
     mkfs.btrfs $VHDX_FILE
 fi
 
@@ -109,25 +171,75 @@ fi
 mkdir -p $MOUNT_POINT
 mount -o loop $VHDX_FILE $MOUNT_POINT
 
+# 检查挂载是否成功
+RC=$?  # 获取 mount 命令的返回值
+case $RC in
+    0)
+        echo -e "${GREEN}已成功挂载: $VHDX_FILE${NC}"
+        ;;
+    32)
+        echo -e "${RED}挂载失败:权限不足 $VHDX_FILE${NC}"
+        exit 1
+        ;;
+    *)
+        if [ -d $SNAPSHAOT_DIR ]; then
+            echo -e "${GREEN}已经挂载: $VHDX_FILE${NC}"
+        else
+            echo -e "${RED}挂载失败: $VHDX_FILE${NC}"
+            exit 1
+        fi
+        ;;
+esac
+
+# 如果子卷Debain不存在则创建
+if [ ! -d "$BACKUP_DIR" ]; then
+    echo "创建子卷: $BACKUP_DIR"
+    btrfs subvolume create $BACKUP_DIR
+fi
+
+# 如果快照目录不存在则创建
+if [ ! -d "$SNAPSHAOT_DIR" ]; then
+    echo "创建快照目录: $SNAPSHAOT_DIR"
+    btrfs subvolume create $SNAPSHAOT_DIR
+fi
+
+# 构建 rsync 排除参数
+EXCLUDES="--exclude=$(readlink -f "$0") "
+for EXCLUDE in "${EXCLUDE_DIR[@]}"; do
+    if [ -n "$EXCLUDE" ] && [ "${EXCLUDE:0:1}" != "#" ]; then
+        EXCLUDES="$EXCLUDES--exclude=$EXCLUDE "
+    fi
+done
+
 if [ "$RESTORE" = true ]; then
     # 还原系统到指定时间
-    RESTORE_DIR="$MOUNT_POINT/$RESTORE_TIME"
+    RESTORE_DIR="$SNAPSHAOT_DIR/$RESTORE_TIME"
     if [ ! -d "$RESTORE_DIR" ]; then
-        echo "指定的还原时间目录不存在: $RESTORE_DIR"
-        umount $MOUNT_POINT
+        echo -e "${RED}指定的还原时间不存在: $RESTORE_TIME${NC}"
+        echo "可用的还原时间列表:"
+        ls $SNAPSHAOT_DIR
         exit 1
     fi
-    btrfs subvolume snapshot $RESTORE_DIR $SOURCE_DIR
-    echo "系统已还原到: $RESTORE_TIME"
+    rsync -avxHAX --numeric-ids --delete --checksum $EXCLUDES $RESTORE_DIR/ $SOURCE_DIR
+    echo -e "${GREEN}系统已还原到: $RESTORE_TIME${NC}"
 else
-    # 备份目标目录
-    DEST_DIR="$MOUNT_POINT/$(date +\%Y-\%m-\%d)"
+    rsync -avxHAX --numeric-ids --delete --checksum $EXCLUDES $SOURCE_DIR $BACKUP_DIR/
 
+    DEST_DIR="$SNAPSHAOT_DIR/$(date +%Y%m%d)"
     # 创建快照
-    btrfs subvolume snapshot $SOURCE_DIR $DEST_DIR
-    echo "系统已备份到: $DEST_DIR"
+    if [ -d "$DEST_DIR" ]; then
+        btrfs subvolume delete $DEST_DIR
+        rm -rf $DEST_DIR
+    fi
+    btrfs subvolume snapshot $BACKUP_DIR $DEST_DIR
+    echo -e "${GREEN}系统已备份到: $DEST_DIR${NC}"
 fi
 
 # 卸载 VHDX 文件
 umount $MOUNT_POINT
+
+cd $(dirname $(readlink -f $0))
+
+git add .
+git commit -m "Backup Debian $(date +%Y%m%d)" 
 ```
